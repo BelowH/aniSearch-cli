@@ -1,10 +1,6 @@
 namespace aniList_cli.GuiObjects;
 
-public interface IPage
+public interface IMainMenu
 {
-    
     public void Display();
-
-
-    public void Back();
 }

@@ -4,20 +4,22 @@ using Spectre.Console;
 
 namespace aniList_cli.GuiObjects;
 
-public class MediaDetail : IPage
+public class MediaDetail : IMediaDetail
 {
-    private readonly int _mediaId;
+    private int _mediaId;
 
-    private readonly SearchRepository _searchRepository;
+    private readonly ISearchRepository _searchRepository;
     
-    public MediaDetail(int mediaId)
+    public event EventHandler? OnBack;
+    
+    public MediaDetail( ISearchRepository searchRepository)
     {
-        _searchRepository = new SearchRepository();
-        _mediaId = mediaId;
+        _searchRepository = searchRepository;
     }
     
-    public void Display()
+    public void Display(int id)
     {
+        _mediaId = id;
         Console.Clear();
         Media media = new Media();
         AnsiConsole.Status().Start(
@@ -40,6 +42,7 @@ public class MediaDetail : IPage
 
     public void Back()
     {
-        throw new NotImplementedException();
+        EventHandler? handler = OnBack;
+        handler?.Invoke(this, EventArgs.Empty);
     }
 }

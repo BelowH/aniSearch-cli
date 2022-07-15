@@ -4,18 +4,34 @@ using Spectre.Console;
 
 namespace aniList_cli.GuiObjects;
 
-public class SearchPage : IPage
+public class SearchPage : ISearchPage
 {
-    private SearchRepository _searchRepository;
 
-    private const string BACK = "[red]Return to Menu[/]";
-    private const string NEXT_PAGE = "[yellow]Next Page[/]";
-    private const string NEW_SEARCH = "[green]New Search[/]";
-    private const string LAST_PAGE = "[yellow]Last Page[/]";
+    public event EventHandler? OnBackToMenu;
     
-    public SearchPage()
+    private readonly ISearchRepository _searchRepository;
+
+    private readonly IMediaDetail _mediaDetail;
+
+    private Page? _currentPage;
+
+    private int _currentPageNumber = 1;
+    
+    private const int PageSize = 5;
+
+    private string? _searchPrompt;
+    
+    private const string SBack = "[red]Return to Menu[/]";
+    private const string SNextPage = "[yellow]Next Page[/]";
+    private const string SNewSearch = "[green]New Search[/]";
+    private const string SLastPage = "[yellow]Last Page[/]";
+    
+    public SearchPage(ISearchRepository searchRepository, IMediaDetail mediaDetail)
     {
-        _searchRepository = new SearchRepository();
+        _currentPage = null;
+        _searchRepository = searchRepository;
+        _mediaDetail = mediaDetail;
+        _mediaDetail.OnBack += (_, _) => DisplayResult();
     }
     
     public void Display()
@@ -25,91 +41,117 @@ public class SearchPage : IPage
         Rule pageTitle = new Rule("[bold blue]Search![/]");
         pageTitle.Alignment = Justify.Left;
         AnsiConsole.Write(pageTitle);
-        string searchPromt = AnsiConsole.Ask<string>("[bold]Search:[/]");
-        const int pageSize = 5;
-        int page = 1;
+        _searchPrompt = AnsiConsole.Ask<string>("[bold]Search:[/]");
 
-        QueryRepository(searchPromt, page, pageSize);
+        SearchAndDisplayPage();
+    }
 
+    private void SearchAndDisplayPage()
+    {
+        if (_searchPrompt == null)
+        {
+            Display();
+            return;
+        }
+        Search(_searchPrompt, _currentPageNumber);
+        DisplayResult();
+    }
+
+    private void DisplayResult()
+    {
+        if (_searchPrompt == null)
+        {
+            Display();
+            return;
+        }
+        if (_currentPage != null)
+        {
+            if (_currentPage.Media.Length < 1)
+            {
+                AnsiConsole.MarkupLine("[bold red]No[/] results found");
+                if (AnsiConsole.Confirm("try again?"))
+                {
+                    Display();
+                }
+                else
+                {
+                    Back();
+                }
+            }
+            
+            List<string> mediaStrings = _currentPage.Media.Select(medium => medium.ToString()).ToList();
+            if (_currentPage.PageInfo.HasNextPage)
+            {
+                mediaStrings.Add(SNextPage);
+            }
+
+            if (_currentPageNumber > 1)
+            {
+                mediaStrings.Add(SLastPage);
+            }
+
+            mediaStrings.Add(SBack);
+            if (_currentPage.PageInfo.HasNextPage)
+            {
+                mediaStrings.Add(SNewSearch);
+            }
+
+            string choice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("[bold]Page: " + _currentPageNumber + "[/]")
+                    .AddChoices(mediaStrings)
+            );
+            switch (choice)
+            {
+                case SBack:
+                    Back();
+                    break;
+                case SNewSearch:
+                    Display();
+                    break;
+                case SNextPage:
+
+                    Search(_searchPrompt, _currentPageNumber++);
+                    break;
+                case SLastPage:
+                    _currentPageNumber--;
+                    if (_currentPageNumber < 1)
+                    {
+                        _currentPageNumber = 1;
+                    }
+                    Search(_searchPrompt, _currentPageNumber);
+                    break;
+            }
+
+            int id = _currentPage.Media.FirstOrDefault(x => x.TitleMatches(choice))!.Id;
+            {
+                _mediaDetail.Display(id);
+            }
+        }
+        else
+        {
+            Display();
+        }
+        
     }
     
-
-    private void QueryRepository(string searchPromt, int page, int pageSize)
+    private void Search(string searchPrompt, int page)
     {
-        Page response = new Page();
         AnsiConsole.Status().Start(
             "Searching",
             ctx =>
             {
                 ctx.SpinnerStyle = new Style(Color.Blue);
-                response = _searchRepository.SearchBySearchString(searchPromt, page, pageSize).Result;
+                _currentPage = _searchRepository.SearchBySearchString(searchPrompt, page, PageSize).Result;
             }
         );
-
-        if (response.Media.Length < 1)
-        {
-            AnsiConsole.MarkupLine("[bold red]No[/] results found");
-            if (AnsiConsole.Confirm("try again?"))
-            {
-                Display();
-            }
-            else
-            {
-                Back();
-            }
-        }
-        List<string> mediaStrings = response.Media.Select(medium => medium.ToString()).ToList();
-        mediaStrings.Add(NEXT_PAGE);
-        mediaStrings.Add(BACK);
-        if (response.PageInfo.HasNextPage)
-        {
-            mediaStrings.Add(NEW_SEARCH);
-        }
-
-        if (page > 1)
-        {
-            mediaStrings.Add(LAST_PAGE);
-        }
-
-        string choice = AnsiConsole.Prompt(
-            new SelectionPrompt<string>()
-                .Title("[bold]Page: " + page+"[/]")
-                .AddChoices(mediaStrings)
-        );
-        switch (choice)
-        {
-            case BACK:
-                Back();
-                break;
-            case NEW_SEARCH:
-                Display();
-                break;
-            case NEXT_PAGE:
-                int pageInc = page + 1;
-                QueryRepository(searchPromt,pageInc,pageSize);
-                break;
-            case LAST_PAGE:
-                int pageDec = page - 1;
-                if (pageDec < 1)
-                {
-                    pageDec = 1;
-                }
-                QueryRepository(searchPromt,pageDec,pageSize);
-                break;
-        }
-
-        int id = response.Media.FirstOrDefault(x => x.TitleMatches(choice))!.Id;
-        {
-            MediaDetail detail = new MediaDetail(id);
-            detail.Display();
-        }
     }
-    
-    
 
-    public void Back()
+
+    private void Back()
     {
-        MainMenu menu = new MainMenu();
-        menu.Display();
+        EventHandler? handler = OnBackToMenu;
+        handler?.Invoke(this, EventArgs.Empty);
+
     }
 }

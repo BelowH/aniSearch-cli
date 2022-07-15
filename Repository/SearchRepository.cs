@@ -4,7 +4,7 @@ using GraphQL.Client.Http;
 
 namespace aniList_cli.Repository;
 
-public class SearchRepository : BaseRepository
+public class SearchRepository : BaseRepository, ISearchRepository
 {
     public async Task<Media> SearchById(int id)
     {
@@ -48,7 +48,7 @@ public class SearchRepository : BaseRepository
                 Variables = new { id = id }
             };
             
-            GraphQLResponse<MediaData> response = await _client.SendQueryAsync<MediaData>(request);
+            GraphQLResponse<MediaData> response = await Client.SendQueryAsync<MediaData>(request);
             return response.Data.Media ?? throw new Exception("Page was null.");
         }
         catch (GraphQLHttpRequestException requestException)
@@ -91,7 +91,7 @@ public class SearchRepository : BaseRepository
                 Variables = new { page = page, perPage = perPage, search = searchQuery }
             };
             
-            GraphQLResponse<PageData> response = await _client.SendQueryAsync<PageData>(request);
+            GraphQLResponse<PageData> response = await Client.SendQueryAsync<PageData>(request);
             return response.Data.Page ?? throw new Exception("Page was null.");
         }
         catch (GraphQLHttpRequestException requestException)

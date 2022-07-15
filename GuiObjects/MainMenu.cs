@@ -1,25 +1,24 @@
-using aniList_cli.Repository;
-using aniList_cli.Repository.Models;
+
 using Spectre.Console;
 
 namespace aniList_cli.GuiObjects;
 
-public class MainMenu : IPage
+public class MainMenu : IMainMenu
 {
-
-    private readonly SearchRepository _searchRepository;
     
-    public MainMenu()
+    private readonly ISearchPage _searchPage;
+    
+    public MainMenu( ISearchPage searchPage)
     {
-        _searchRepository = new SearchRepository();
+        _searchPage = searchPage;
     }
 
-    private const string SEARCH = "Search";
-    private const string MY_LIST = "My List";
-    private const string LOGIN = "Login";
-    private const string PROFILE = "Profile";
-    private const string SETTINGS = "Settings";
-    private const string EXIT = "[red]Exit[/]";
+    private const string SSearch = "Search";
+    private const string SMyList = "My List";
+    private const string SLogin = "Login";
+    private const string SProfile = "Profile";
+    private const string SSettings = "Settings";
+    private const string SExit = "[red]Exit[/]";
     
 
     public void Display()
@@ -34,41 +33,38 @@ public class MainMenu : IPage
                 new SelectionPrompt<string>()
                     .AddChoices(new []
                     {
-                        SEARCH,
-                        MY_LIST,
-                        PROFILE,
-                        LOGIN,
-                        SETTINGS,
-                        EXIT
+                        SSearch,
+                        SMyList,
+                        SProfile,
+                        SLogin,
+                        SSettings,
+                        SExit
                     })
             );
             switch (choice)
             {
-                case SEARCH :
+                case SSearch :
                     Search();
                     break;
-                case MY_LIST:
+                case SMyList:
                     My_List();
                     break;
-                case PROFILE:
+                case SProfile:
                     Profile();
                     break;
-                case LOGIN:
+                case SLogin:
                     Login();
                     break;
-                case SETTINGS:
+                case SSettings:
                     Settings();
                     break;
-                case EXIT:
+                case SExit:
                     Environment.Exit(0);
                     break;
                 default:
                     //should not happen
                     throw new ArgumentException("choice not found");
             }
-            
-
-
         }
         catch (Exception e)
         {
@@ -76,7 +72,7 @@ public class MainMenu : IPage
             throw;
         }
     }
-
+    
     public void Back()
     {
         Display();
@@ -84,8 +80,7 @@ public class MainMenu : IPage
 
     private void Search()
     {
-        SearchPage searchPage = new SearchPage();
-        searchPage.Display();
+        _searchPage.Display();
     }
 
     private void My_List()

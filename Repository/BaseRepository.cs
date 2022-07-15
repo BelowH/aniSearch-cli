@@ -4,15 +4,15 @@ using GraphQL.Client.Serializer.Newtonsoft;
 
 namespace aniList_cli.Repository;
 
-public class BaseRepository
+public class BaseRepository 
 {
-    protected const string graphQlUrl = "https://graphql.anilist.co/";
+    private const string GraphQlUrl = "https://graphql.anilist.co/";
 
-    protected IGraphQLClient _client;
-    
-    public BaseRepository()
+    protected readonly IGraphQLClient Client;
+
+    protected BaseRepository()
     {
-        _client = new GraphQLHttpClient(graphQlUrl, new NewtonsoftJsonSerializer());
+        Client = new GraphQLHttpClient(GraphQlUrl, new NewtonsoftJsonSerializer());
     }
     
 }
