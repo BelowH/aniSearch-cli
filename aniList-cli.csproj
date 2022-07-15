@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>aniList_cli</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GraphQL" Version="5.3.1" />
+    <PackageReference Include="GraphQL-Parser" Version="8.0.0" />
+    <PackageReference Include="GraphQL.Client" Version="4.0.2" />
+    <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="4.0.2" />
+    <PackageReference Include="GraphQL.SystemTextJson" Version="5.3.1" />
+    <PackageReference Include="Spectre.Console" Version="0.44.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="ASCII\ascii-art.txt" />
+    <Content Include="ASCII\logo.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
