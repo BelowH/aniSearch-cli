@@ -10,7 +10,10 @@ public class SearchMedia
     [JsonProperty(PropertyName = "title")] 
     public Title Title { get; set; } = new Title();
 
-    public override string ToString()
+    [JsonProperty(PropertyName = "type")]
+    public MediaType Type { get; set; }
+
+    public string GetTitle()
     {
         string titleString = "";
         if (Title.English != null)
@@ -27,21 +30,19 @@ public class SearchMedia
         return titleString;
     }
 
+    public override string ToString()
+    {
+        string type = Type switch
+        {
+            MediaType.ANIME => "[green](Anime)[/] ",
+            MediaType.MANGA => "[blue](Manga)[/] ",
+            _ => ""
+        };
+        return type + GetTitle();
+    }
+
     public bool TitleMatches(string title)
     {
-        if (Title.English != null && Title.English.Equals(title,StringComparison.InvariantCultureIgnoreCase))
-        {
-            return true;
-        }
-        else if (Title.Romanji != null && Title.Romanji.Equals(title,StringComparison.InvariantCultureIgnoreCase))
-        {
-            return true;
-        }
-        else if (Title.Native != null && Title.Native.Equals(title,StringComparison.InvariantCultureIgnoreCase))
-        {
-            return true;
-        }
-
-        return false;
+        return ToString().Equals(title, StringComparison.InvariantCultureIgnoreCase);
     }
 }

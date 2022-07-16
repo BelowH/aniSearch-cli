@@ -33,13 +33,19 @@ public class Media
     public int? SeasonYear { get; set; }
 
     [JsonProperty(PropertyName = "type")]
-    public MediaType? Type { get; set; }
+    public MediaType Type { get; set; }
 
     [JsonProperty(PropertyName = "format")]
     public MediaFormat? Format { get; set; }
 
     [JsonProperty(PropertyName = "status")]
     public MediaStatus? Status { get; set; }
+
+    [JsonProperty(PropertyName = "studios")]
+    public MediaStudio? Studio { get; set; }
+
+    [JsonProperty(PropertyName = "genres")]
+    public string[]? Genres { get; set; }
 
     [JsonProperty(PropertyName = "episodes")]
     public int? Episodes { get; set; }
@@ -68,5 +74,22 @@ public class MediaDate
     
     [JsonProperty(PropertyName = "day")]
     public int?  Day { get; set; }
+}
+
+public class MediaStudio
+{
+
+    [JsonProperty(PropertyName = "nodes")]
+    public Node[]? Nodes { get; set; }
+    
+    public class Node
+    {
+        [JsonProperty(PropertyName = "name")]
+        public string? Name { get; set; }
+
+        [JsonProperty(PropertyName = "isAnimationStudio")]
+        public bool IsAnimationStudio { get; set; }
+    }
+    
 }
 

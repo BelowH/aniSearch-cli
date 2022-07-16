@@ -29,6 +29,13 @@ public class SearchRepository : BaseRepository, ISearchRepository
                         episodes
                         averageScore
                         meanScore
+                        genres
+    	                studios {
+                            nodes {
+                                name
+                                isAnimationStudio
+                            }
+    	                }
                         startDate {
                             year
                             month
@@ -79,6 +86,7 @@ public class SearchRepository : BaseRepository, ISearchRepository
                             }
                             media(search: $search){
                                 id
+                                type
                                 title{
                                     romaji
                                     english

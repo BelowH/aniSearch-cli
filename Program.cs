@@ -15,18 +15,17 @@ static class Program
         
         try
         {
-            //end program when user hist Ctrl + c
-            
-            
             //Setup DI
             IHost host = Host.CreateDefaultBuilder(args)
                 .ConfigureServices((_, services) => ConfigureServices(services))
                 .Build();
             
+            //end program when user hist Ctrl + c
             Console.CancelKeyPress += async (_,_) =>
             {
-                Console.WriteLine("cancel ...");
                 await host.StopAsync(new TimeSpan(100));
+                Console.CursorVisible = true;
+                Console.Clear();
                 Environment.Exit(1);
             };
             

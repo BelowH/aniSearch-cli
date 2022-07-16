@@ -15,9 +15,9 @@ public class SearchPage : ISearchPage
 
     private Page? _currentPage;
 
-    private int _currentPageNumber = 1;
+    private int _currentPageNumber;
     
-    private const int PageSize = 5;
+    private const int PageSize = 10;
 
     private string? _searchPrompt;
     
@@ -37,7 +37,7 @@ public class SearchPage : ISearchPage
     public void Display()
     {
         Console.Clear();
-        
+        _currentPageNumber = 1;   
         Rule pageTitle = new Rule("[bold blue]Search![/]");
         pageTitle.Alignment = Justify.Left;
         AnsiConsole.Write(pageTitle);
@@ -59,6 +59,10 @@ public class SearchPage : ISearchPage
 
     private void DisplayResult()
     {
+        Console.Clear();
+        Rule pageTitle = new Rule("[bold blue]Search Result:[/]");
+        pageTitle.Alignment = Justify.Left;
+        AnsiConsole.Write(pageTitle);
         if (_searchPrompt == null)
         {
             Display();
@@ -84,12 +88,10 @@ public class SearchPage : ISearchPage
             {
                 mediaStrings.Add(SNextPage);
             }
-
             if (_currentPageNumber > 1)
             {
                 mediaStrings.Add(SLastPage);
             }
-
             mediaStrings.Add(SBack);
             if (_currentPage.PageInfo.HasNextPage)
             {
@@ -110,8 +112,8 @@ public class SearchPage : ISearchPage
                     Display();
                     break;
                 case SNextPage:
-
                     Search(_searchPrompt, _currentPageNumber++);
+                    DisplayResult();
                     break;
                 case SLastPage:
                     _currentPageNumber--;
@@ -120,6 +122,7 @@ public class SearchPage : ISearchPage
                         _currentPageNumber = 1;
                     }
                     Search(_searchPrompt, _currentPageNumber);
+                    DisplayResult();
                     break;
             }
 

@@ -1,4 +1,6 @@
 
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Spectre.Console;
 
 namespace aniList_cli.GuiObjects;
@@ -11,6 +13,7 @@ public class MainMenu : IMainMenu
     public MainMenu( ISearchPage searchPage)
     {
         _searchPage = searchPage;
+        _searchPage.OnBackToMenu += (_,_) => Display();
     }
 
     private const string SSearch = "Search";
@@ -59,7 +62,7 @@ public class MainMenu : IMainMenu
                     Settings();
                     break;
                 case SExit:
-                    Environment.Exit(0);
+                    Exit();
                     break;
                 default:
                     //should not happen
@@ -73,11 +76,6 @@ public class MainMenu : IMainMenu
         }
     }
     
-    public void Back()
-    {
-        Display();
-    }
-
     private void Search()
     {
         _searchPage.Display();
@@ -91,6 +89,33 @@ public class MainMenu : IMainMenu
     
     private void Login()
     {
+        string url = "https://anilist.co/api/v2/oauth/authorize?client_id=8875&response_type=token";
+        try
+        {
+            Process.Start(url);
+        }
+        catch
+        {
+            // hack because of this: https://github.com/dotnet/corefx/issues/10361
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                url = url.Replace("&", "^&");
+                Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Process.Start("xdg-open", url);
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                Process.Start("open", url);
+            }
+            else
+            {
+                throw;
+            }
+        }
+        Console.ReadKey();
         Console.WriteLine("Not implemented yet :(");
         Display();
     }
@@ -106,5 +131,10 @@ public class MainMenu : IMainMenu
         Console.WriteLine("Not implemented yet :(");
         Display();
     }
-    
+
+    private void Exit()
+    {
+        Console.Clear();
+        Environment.Exit(0);
+    }
 }
