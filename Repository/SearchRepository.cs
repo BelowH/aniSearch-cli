@@ -1,11 +1,24 @@
 using aniList_cli.Repository.Models;
+using aniList_cli.Settings;
 using GraphQL;
 using GraphQL.Client.Http;
+using GraphQL.Client.Serializer.Newtonsoft;
 
 namespace aniList_cli.Repository;
 
-public class SearchRepository : BaseRepository, ISearchRepository
+public class SearchRepository :  ISearchRepository
 {
+
+    private readonly AppParameter _parameter;
+
+    private readonly GraphQLHttpClient _client;
+    
+    public SearchRepository(AppParameter parameter)
+    {
+        _parameter = parameter;
+        _client = new GraphQLHttpClient(_parameter.ApiEndpoint!, new NewtonsoftJsonSerializer());
+    }
+    
     public async Task<Media> SearchById(int id)
     {
         try
@@ -55,7 +68,7 @@ public class SearchRepository : BaseRepository, ISearchRepository
                 Variables = new { id = id }
             };
             
-            GraphQLResponse<MediaData> response = await Client.SendQueryAsync<MediaData>(request);
+            GraphQLResponse<MediaData> response = await _client.SendQueryAsync<MediaData>(request);
             return response.Data.Media ?? throw new Exception("Page was null.");
         }
         catch (GraphQLHttpRequestException requestException)
@@ -99,7 +112,7 @@ public class SearchRepository : BaseRepository, ISearchRepository
                 Variables = new { page = page, perPage = perPage, search = searchQuery }
             };
             
-            GraphQLResponse<PageData> response = await Client.SendQueryAsync<PageData>(request);
+            GraphQLResponse<PageData> response = await _client.SendQueryAsync<PageData>(request);
             return response.Data.Page ?? throw new Exception("Page was null.");
         }
         catch (GraphQLHttpRequestException requestException)

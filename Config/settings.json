@@ -1,0 +1,10 @@
+{
+  "apiEndpoint" : "https://graphql.anilist.co/",
+  "apiAuthEndpoint" : "https://anilist.co/api/v2/oauth/authorize?client_id=8875&response_type=token",
+  "apiClientId" : "8875",
+  "mainColorHex" : "",
+  "highlightColorHex" : "",
+  "button1ColorHex" : "",
+  "button2ColorHex" : "",
+  "button3ColorHex" : ""
+}

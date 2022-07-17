@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using aniList_cli.GuiObjects;
+using aniList_cli.Helper;
 using aniList_cli.Repository;
+using aniList_cli.Settings;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting.Internal;
@@ -55,7 +57,11 @@ static class Program
     /// <param name="services"></param>
     public static void ConfigureServices(IServiceCollection services)
     {
+        //load and register app parameter
+        AppParameter parameter = FileHelper.ReadAppParameter();
+        services.AddSingleton(parameter);
         
+        //register services
         services.AddScoped<ISearchRepository,SearchRepository>();
         services.AddTransient<IMediaDetail, MediaDetail>();
         services.AddTransient<ISearchPage, SearchPage>();
