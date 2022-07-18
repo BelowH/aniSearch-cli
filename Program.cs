@@ -1,7 +1,8 @@
 ﻿using System.Reflection;
-using aniList_cli.GuiObjects;
+using aniList_cli.Gui;
 using aniList_cli.Helper;
 using aniList_cli.Repository;
+using aniList_cli.Repository.UnauthenticatedRequests;
 using aniList_cli.Settings;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,11 +34,8 @@ static class Program
             
             using (host)
             {
-                
                 await host.StartAsync();
-                
                 host.Services.GetService<IMainMenu>()!.Display();
-                
             }
         }
         catch (Exception e)

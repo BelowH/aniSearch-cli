@@ -4,19 +4,15 @@ using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
 
-namespace aniList_cli.Repository;
+namespace aniList_cli.Repository.UnauthenticatedRequests;
 
 public class SearchRepository :  ISearchRepository
 {
-
-    private readonly AppParameter _parameter;
-
     private readonly GraphQLHttpClient _client;
     
     public SearchRepository(AppParameter parameter)
     {
-        _parameter = parameter;
-        _client = new GraphQLHttpClient(_parameter.ApiEndpoint!, new NewtonsoftJsonSerializer());
+        _client = new GraphQLHttpClient(parameter.ApiEndpoint!, new NewtonsoftJsonSerializer());
     }
     
     public async Task<Media> SearchById(int id)

@@ -1,9 +1,6 @@
-
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using Spectre.Console;
 
-namespace aniList_cli.GuiObjects;
+namespace aniList_cli.Gui;
 
 public class MainMenu : IMainMenu
 {
@@ -89,35 +86,7 @@ public class MainMenu : IMainMenu
     
     private void Login()
     {
-        string url = "https://anilist.co/api/v2/oauth/authorize?client_id=8875&response_type=token";
-        try
-        {
-            Process.Start(url);
-        }
-        catch
-        {
-            // hack because of this: https://github.com/dotnet/corefx/issues/10361
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                url = url.Replace("&", "^&");
-                Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                Process.Start("xdg-open", url);
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                Process.Start("open", url);
-            }
-            else
-            {
-                throw;
-            }
-        }
-        Console.ReadKey();
-        Console.WriteLine("Not implemented yet :(");
-        Display();
+       
     }
 
     private void Profile()

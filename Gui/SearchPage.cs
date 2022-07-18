@@ -1,8 +1,8 @@
-using aniList_cli.Repository;
 using aniList_cli.Repository.Models;
+using aniList_cli.Repository.UnauthenticatedRequests;
 using Spectre.Console;
 
-namespace aniList_cli.GuiObjects;
+namespace aniList_cli.Gui;
 
 public class SearchPage : ISearchPage
 {

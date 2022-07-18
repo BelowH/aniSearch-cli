@@ -4,7 +4,5 @@ public interface ILoginService
 {
     public string GetToken();
 
-    public bool IsLoggedIn();
-
-    public string NewToken();
+    public string GetUserId();
 }

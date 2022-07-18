@@ -36,3 +36,13 @@ public enum MediaType
     ANIME,
     MANGA
 }
+
+public enum MediaListStatus
+{
+    CURRENT,
+    PLANNING,
+    COMPLETED,
+    DROPPED,
+    PAUSED,
+    REPEATING
+}

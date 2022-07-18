@@ -1,4 +1,4 @@
-namespace aniList_cli.GuiObjects;
+namespace aniList_cli.Gui;
 
 public interface IMediaDetail
 {
