@@ -47,7 +47,7 @@ public class LoginService : ILoginService
     /// </summary>
     /// <exception cref="AuthenticationException">jwt token was not correct and user didn't retry.</exception>
     /// <returns>Jwt token as string</returns>
-    private JwtSecurityToken NewToken()
+    public JwtSecurityToken NewToken()
     {
         string url = _parameter.ApiAuthEndpoint!;
         try

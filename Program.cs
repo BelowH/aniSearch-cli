@@ -3,6 +3,7 @@ using aniList_cli.Gui;
 using aniList_cli.Helper;
 using aniList_cli.Repository;
 using aniList_cli.Repository.UnauthenticatedRequests;
+using aniList_cli.Service;
 using aniList_cli.Settings;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,6 +51,7 @@ static class Program
     }
 
     /// <summary>
+    ///  And load settings
     ///  Configure Services for DI
     /// </summary>
     /// <param name="services"></param>
@@ -60,6 +62,9 @@ static class Program
         services.AddSingleton(parameter);
         
         //register services
+        services.AddSingleton<ILoginService, LoginService>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddSingleton<IUserPage, UserPage>();
         services.AddScoped<ISearchRepository,SearchRepository>();
         services.AddTransient<IMediaDetail, MediaDetail>();
         services.AddTransient<ISearchPage, SearchPage>();

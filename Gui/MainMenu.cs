@@ -6,16 +6,19 @@ public class MainMenu : IMainMenu
 {
     
     private readonly ISearchPage _searchPage;
+
+    private readonly IUserPage _userPage;
     
-    public MainMenu( ISearchPage searchPage)
+    public MainMenu( ISearchPage searchPage, IUserPage userPage)
     {
         _searchPage = searchPage;
+        _userPage = userPage;
+        _userPage.OnBackToMenu += (_, _) => Display();
         _searchPage.OnBackToMenu += (_,_) => Display();
     }
 
     private const string SSearch = "Search";
     private const string SMyList = "My List";
-    private const string SLogin = "Login";
     private const string SProfile = "Profile";
     private const string SSettings = "Settings";
     private const string SExit = "[red]Exit[/]";
@@ -36,7 +39,6 @@ public class MainMenu : IMainMenu
                         SSearch,
                         SMyList,
                         SProfile,
-                        SLogin,
                         SSettings,
                         SExit
                     })
@@ -51,9 +53,6 @@ public class MainMenu : IMainMenu
                     break;
                 case SProfile:
                     Profile();
-                    break;
-                case SLogin:
-                    Login();
                     break;
                 case SSettings:
                     Settings();
@@ -84,15 +83,10 @@ public class MainMenu : IMainMenu
         Display(); 
     }
     
-    private void Login()
-    {
-       
-    }
 
     private void Profile()
     {
-        Console.WriteLine("Not implemented yet :(");
-        Display();
+        _userPage.Display();
     }
 
     private void Settings()

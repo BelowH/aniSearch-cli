@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace aniList_cli.Repository.Models;
 
@@ -23,6 +22,9 @@ public class AniListUser
 
     [JsonProperty(PropertyName = "updatedAt")]
     public int? UpdatedAt { get; set; }
+
+    [JsonProperty(PropertyName = "statistics")]
+    public UserStatisticTypes? StatisticTypes { get; set; }
 }
 
 public class UserStatisticTypes
@@ -36,5 +38,44 @@ public class UserStatisticTypes
 
 public class UserStatistics
 {
+    [JsonProperty(PropertyName = "count")]
+    public int Count { get; set; }
+
+    [JsonProperty(PropertyName = "meanScore")]
+    public float MeanScore { get; set; }
+
+    [JsonProperty(PropertyName = "minutesWatched")]
+    public int MinutesWatched { get; set; }
+
+    [JsonProperty(PropertyName = "episodesWatched")]
+    public int EpisodesWatched { get; set; }
+
+    [JsonProperty(PropertyName = "chaptersRead")]
+    public int ChaptersRead { get; set; }
+
+    [JsonProperty(PropertyName = "volumesRead")]
+    public int VolumesRead { get; set; }
+
+    [JsonProperty(PropertyName = "statuses")]
+    public UserStatusStatistic[]? Statistic { get; set; }
+}
+
+public class UserStatusStatistic
+{
+
+    [JsonProperty(PropertyName = "count")]
+    public int Count { get; set; }
+
+    [JsonProperty(PropertyName = "meanScore")]
+    public float MeanScore { get; set; }
+
+    [JsonProperty(PropertyName = "minutesWatched")]
+    public int MinutesWatched { get; set; }
+    
+    [JsonProperty(PropertyName = "chaptersRead")]
+    public int ChaptersRead { get; set; }
+
+    [JsonProperty(PropertyName = "status")]
+    public MediaListStatus MediaListStatus { get; set; }
     
 }

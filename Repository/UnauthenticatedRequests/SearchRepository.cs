@@ -8,17 +8,18 @@ namespace aniList_cli.Repository.UnauthenticatedRequests;
 
 public class SearchRepository :  ISearchRepository
 {
-    private readonly GraphQLHttpClient _client;
+    private readonly AppParameter _parameter;
     
     public SearchRepository(AppParameter parameter)
     {
-        _client = new GraphQLHttpClient(parameter.ApiEndpoint!, new NewtonsoftJsonSerializer());
+        _parameter = parameter;
     }
     
     public async Task<Media> SearchById(int id)
     {
         try
         {
+          
             GraphQLRequest request = new GraphQLRequest
             {
                 Query = @"query MediaSearch($id: Int){
@@ -26,45 +27,46 @@ public class SearchRepository :  ISearchRepository
                     Media(id: $id){
                         id
                         title{
-                            romaji
-                            english
+                            romaji,
+                            english,
                             native
                         }
-                        type
-                        format
-                        description
-                        season
-                        seasonYear
-                        episodes
-                        averageScore
-                        meanScore
-                        genres
+                        type,
+                        format,
+                        description,
+                        season,
+                        seasonYear,
+                        episodes,
+                        averageScore,
+                        meanScore,
+                        genres,
     	                studios {
                             nodes {
-                                name
+                                name,
                                 isAnimationStudio
                             }
     	                }
                         startDate {
-                            year
-                            month
+                            year,
+                            month,
                             day
                         }
                         endDate {
-                            year
-                            month
+                            year,
+                            month,
                             day
                         }
-                        status
-                        chapters
+                        status,
+                        chapters,
                         volumes
                     }
                 }",
                 OperationName = "MediaSearch",
                 Variables = new { id = id }
             };
-            
-            GraphQLResponse<MediaData> response = await _client.SendQueryAsync<MediaData>(request);
+
+            using GraphQLHttpClient client = new GraphQLHttpClient(_parameter.ApiEndpoint!, new NewtonsoftJsonSerializer());
+            GraphQLResponse<MediaData> response = await client.SendQueryAsync<MediaData>(request);
             return response.Data.Media ?? throw new Exception("Page was null.");
         }
         catch (GraphQLHttpRequestException requestException)
@@ -88,17 +90,17 @@ public class SearchRepository :  ISearchRepository
                 Query = @"query PageSearch($page: Int $perPage: Int $search: String){
                         Page(page: $page perPage: $perPage){
                             pageInfo{
-                                perPage
-                                currentPage
-                                lastPage
-                                hasNextPage
+                                perPage,
+                                currentPage,
+                                lastPage,
+                                hasNextPage,
                             }
                             media(search: $search){
-                                id
-                                type
+                                id,
+                                type,
                                 title{
-                                    romaji
-                                    english
+                                    romaji,
+                                    english,
                                     native
                                 }
                             }                        
@@ -108,7 +110,8 @@ public class SearchRepository :  ISearchRepository
                 Variables = new { page = page, perPage = perPage, search = searchQuery }
             };
             
-            GraphQLResponse<PageData> response = await _client.SendQueryAsync<PageData>(request);
+            using GraphQLHttpClient client = new GraphQLHttpClient(_parameter.ApiEndpoint!, new NewtonsoftJsonSerializer());
+            GraphQLResponse<PageData> response = await client.SendQueryAsync<PageData>(request);
             return response.Data.Page ?? throw new Exception("Page was null.");
         }
         catch (GraphQLHttpRequestException requestException)

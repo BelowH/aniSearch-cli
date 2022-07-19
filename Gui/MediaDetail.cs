@@ -23,7 +23,7 @@ public class MediaDetail : IMediaDetail
         Console.Clear();
         Media media = new Media();
         AnsiConsole.Status().Start(
-            "Loading",
+            "Loading Media",
             ctx =>
             {
                 ctx.SpinnerStyle = new Style(Color.Blue);
