@@ -53,7 +53,10 @@ public class AppParameter
             ? new CustomConsoleColor(value)
             : new CustomConsoleColor(ConsoleColor.Yellow);
     }
-
+    
+    [JsonProperty(PropertyName = "saveAuthToken")]
+    public bool SaveAuthToken { get; set; }
+    
     [JsonIgnore]
     public CustomConsoleColor? MainColor { get; private init; }
 
@@ -67,6 +70,8 @@ public class AppParameter
     public CustomConsoleColor? Button2Color { get; private init; } 
     
     [JsonIgnore]
-    public CustomConsoleColor? Button3Color { get; private init; } 
+    public CustomConsoleColor? Button3Color { get; private init; }
+
+    
 
 }

@@ -7,6 +7,6 @@
   "button1ColorHex" : "",
   "button2ColorHex" : "",
   "button3ColorHex" : "",
-  "saveAuthToken" : "",
-  "authTokenExpireDate" : ""
+  "saveAuthToken" : true
+  
 }

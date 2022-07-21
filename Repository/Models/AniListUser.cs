@@ -77,5 +77,7 @@ public class UserStatusStatistic
 
     [JsonProperty(PropertyName = "status")]
     public MediaListStatus MediaListStatus { get; set; }
-    
+
+    [JsonProperty(PropertyName = "mediaIds")]
+    public int[] MediaIds { get; set; } = Array.Empty<int>();
 }

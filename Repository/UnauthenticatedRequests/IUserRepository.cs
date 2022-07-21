@@ -6,5 +6,6 @@ public interface IUserRepository
 {
    public Task<AniListUser?> GetUserById(int userId);
 
-
+   
+   
 }

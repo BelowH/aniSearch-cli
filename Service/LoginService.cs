@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Authentication;
 using aniList_cli.Settings;
@@ -18,9 +19,23 @@ public class LoginService : ILoginService
     
     public LoginService(AppParameter parameter)
     {
-        _token = null;
+
+        try
+        {
+            AuthToken token = AuthToken.Load();
+            if (token.ExpireDate > DateTime.UtcNow)
+            {
+                _token = new JwtSecurityToken(token.Token);
+                _userId = _token.Subject;
+            }
+        }
+        catch (Exception)
+        {
+            _token = null;
+            _userId = null;
+        }
         _parameter = parameter;
-        _userId = null;
+        
     }
     
     /// <summary>
@@ -80,7 +95,14 @@ public class LoginService : ILoginService
 
         try
         {
-            return new JwtSecurityToken(token);
+            _token = new JwtSecurityToken(token);
+            _userId = _token.Subject;
+            if (_parameter.SaveAuthToken)
+            {
+                AuthToken authToken = new AuthToken(_token);
+                authToken.Save();
+            }
+            return _token;
         }
         catch (Exception exception)
         {
@@ -97,4 +119,5 @@ public class LoginService : ILoginService
             throw new AuthenticationException("jwt token was not correct and user didn't retry.",exception);
         }
     }
+    
 }
