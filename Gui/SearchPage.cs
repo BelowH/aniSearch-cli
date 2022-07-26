@@ -11,7 +11,7 @@ public class SearchPage : ISearchPage
     
     private readonly ISearchRepository _searchRepository;
 
-    private readonly IMediaDetail _mediaDetail;
+    private readonly IMediaDetailPage _mediaDetailPage;
 
     private Page? _currentPage;
 
@@ -26,12 +26,12 @@ public class SearchPage : ISearchPage
     private const string SNewSearch = "[green]New Search[/]";
     private const string SLastPage = "[yellow]Last Page[/]";
     
-    public SearchPage(ISearchRepository searchRepository, IMediaDetail mediaDetail)
+    public SearchPage(ISearchRepository searchRepository, IMediaDetailPage mediaDetailPage)
     {
         _currentPage = null;
         _searchRepository = searchRepository;
-        _mediaDetail = mediaDetail;
-        _mediaDetail.OnBack += (_, _) => DisplayResult();
+        _mediaDetailPage = mediaDetailPage;
+        _mediaDetailPage.OnBack += (_, _) => DisplayResult();
     }
     
     public void Display()
@@ -128,7 +128,7 @@ public class SearchPage : ISearchPage
 
             int id = _currentPage.Media.FirstOrDefault(x => x.TitleMatches(choice))!.Id;
             {
-                _mediaDetail.Display(id);
+                _mediaDetailPage.Display(id);
             }
         }
         else

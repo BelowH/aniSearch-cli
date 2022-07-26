@@ -21,9 +21,9 @@ static class Program
         {
             //Setup DI
             IHost host = Host.CreateDefaultBuilder(args)
-                .ConfigureServices((_, services) => ConfigureServices(services))
+                .ConfigureServices((context, services) => ConfigureServices(services))
                 .Build();
-            
+
             //end program when user hist Ctrl + c
             Console.CancelKeyPress += async (_,_) =>
             {
@@ -60,13 +60,15 @@ static class Program
         //load and register app parameter
         AppParameter parameter = FileHelper.ReadAppParameter();
         services.AddSingleton(parameter);
-        
+
         //register services
+        services.AddScoped<IMediaListRepository, MediaListRepository>();
+        services.AddScoped<IMediaListPage, MediaListPage>();
         services.AddSingleton<ILoginService, LoginService>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddSingleton<IUserPage, UserPage>();
         services.AddScoped<ISearchRepository,SearchRepository>();
-        services.AddTransient<IMediaDetail, MediaDetail>();
+        services.AddTransient<IMediaDetailPage, MediaDetailPage>();
         services.AddTransient<ISearchPage, SearchPage>();
         services.AddSingleton<IMainMenu, MainMenu>();
         

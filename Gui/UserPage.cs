@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Authentication;
 using aniList_cli.Repository.Models;
 using aniList_cli.Repository.UnauthenticatedRequests;
@@ -27,7 +28,7 @@ public class UserPage : IUserPage
 
     /// <summary>
     ///  Gets userId from service, then loads user data and displays it.
-    ///  Should something go wrong a Message is Displayed and the
+    ///  Should something go wrong a Message is Displayed and the user can return to the menu.
     /// </summary>
     public void Display()
     {
@@ -63,21 +64,39 @@ public class UserPage : IUserPage
         rule.Alignment = Justify.Center;
         rule.Border = BoxBorder.Rounded;
         AnsiConsole.Write(rule);
-
         if (user.StatisticTypes != null )
         {
             if (user.StatisticTypes.AnimeStatistics != null)
             {
-                UserStatistics animeStats = user.StatisticTypes.AnimeStatistics;
-                Table animeTable = new Table();
-                animeTable.Alignment = Justify.Center;
-                animeTable.Border = TableBorder.Rounded;
-                animeTable.AddColumn("Total Anime");
-                animeTable.AddColumn("Days Watched");
-                animeTable.AddColumn("Mean Score");
-                animeTable.AddRow($"[blue]{animeStats.Count}[/]",$"[blue]{animeStats.MinutesWatched/1440}[/]",$"[blue]{animeStats.MeanScore}[/]");
-                AnsiConsole.Write(animeTable);
+                Table animeTable = new Table
+                {
+                    Title = new TableTitle("[blue bold]ANIME[/]"),
+                    Border = TableBorder.None,
+                    Alignment = Justify.Center,
+                    
+                };
 
+                UserStatistics animeStats = user.StatisticTypes.AnimeStatistics;
+                Table animeStatsTable = new Table
+                {
+                    Alignment = Justify.Center,
+                    Border = TableBorder.Rounded,
+                    Expand = false,
+                    ShowHeaders = false
+                };
+                
+                animeStatsTable.AddColumn("");
+                animeStatsTable.AddColumn("");
+                animeStatsTable.AddRow("Total Anime", $"[blue]{animeStats.Count}[/]");
+                animeStatsTable.AddEmptyRow();
+                animeStatsTable.AddRow("Days Watched",$"[blue]{Math.Round((decimal)animeStats.MinutesWatched/1440,2)}[/]");
+                animeStatsTable.AddEmptyRow();
+                animeStatsTable.AddRow("Mean Score",$"[blue]{animeStats.MeanScore}[/]");
+                
+                Table animeChartTable = new Table()
+                {
+                    Border = TableBorder.Rounded
+                };
                 if (animeStats.Statistic is { Length: > 0 })
                 {
                     BarChart animeChart = new BarChart().Width(animeStats.Count);
@@ -85,39 +104,73 @@ public class UserPage : IUserPage
                     {
                         animeChart.AddItem(statistic.MediaListStatus.ToString(), statistic.Count, Color.Blue);
                     }
-                    AnsiConsole.Write(animeChart);
+
+                    animeChartTable.AddColumn(new TableColumn(animeChart));
                 }
+                else
+                {
+                    animeChartTable.AddColumn(new TableColumn("No Manga Statistics found."));
+                }
+
+                animeTable.AddColumn(new TableColumn(animeStatsTable));
+                animeTable.AddColumn(new TableColumn(animeChartTable));
+                AnsiConsole.Write(animeTable);
                 
             }
             if (user.StatisticTypes.MangaStatistics != null)
             {
+                Table mangaTable = new Table()
+                {
+                    Title = new TableTitle("[blue bold]MANGA[/]"),
+                    Border = TableBorder.None,
+                    Alignment = Justify.Center,
+                };
                 UserStatistics mangaStats = user.StatisticTypes.MangaStatistics;
-                Table mangaTable = new Table();
-                mangaTable.Alignment = Justify.Center;
-                mangaTable.Border = TableBorder.Rounded;
-                mangaTable.AddColumn("Total Manga");
-                mangaTable.AddColumn("Chapters Read");
-                mangaTable.AddColumn("Volumes Read");
-                mangaTable.AddRow($"[blue]{mangaStats.Count}[/]",$"[blue]{mangaStats.ChaptersRead}[/]",$"[blue]{mangaStats.VolumesRead}[/]");
-                AnsiConsole.Write(mangaTable);
-                
+                Table mangaStatsTable = new Table
+                {
+                    Alignment = Justify.Center,
+                    Border = TableBorder.Rounded,
+                    Expand = false,
+                    ShowHeaders = false
+                };
+                mangaStatsTable.AddColumn("");
+                mangaStatsTable.AddColumn("");
+                mangaStatsTable.AddRow("Total Manga", $"[blue]{mangaStats.Count}[/]");
+                mangaStatsTable.AddEmptyRow();
+                mangaStatsTable.AddRow("Chapters Read", $"[blue]{mangaStats.ChaptersRead}[/]");
+                mangaStatsTable.AddEmptyRow();
+                mangaStatsTable.AddRow("Volumes Read", $"[blue]{mangaStats.VolumesRead}[/]");
+
+                Table mangaChartTable = new Table()
+                {
+                    Border = TableBorder.Rounded,
+                    Expand = true
+                };
                 if (mangaStats.Statistic is { Length: > 0 })
                 {
-                    BarChart animeChart = new BarChart().Width(mangaStats.Count);
+                    BarChart mangaChart = new BarChart().Width(mangaStats.Count);
                     foreach (UserStatusStatistic statistic in mangaStats.Statistic)
                     {
-                        animeChart.AddItem(statistic.MediaListStatus.ToString(), statistic.Count, Color.Blue);
+                        mangaChart.AddItem(statistic.MediaListStatus.ToString(), statistic.Count, Color.Blue);
                     }
-                    AnsiConsole.Write(animeChart);
+
+                    mangaChartTable.AddColumn(new TableColumn(mangaChart));
                 }
+                else
+                {
+                    mangaChartTable.AddColumn(new TableColumn("No Manga Statistics found."));
+                }
+
+                mangaTable.AddColumn(new TableColumn(mangaStatsTable));
+                mangaTable.AddColumn(new TableColumn(mangaChartTable));
+                AnsiConsole.Write(mangaTable);
             }
-            
         }
         
         AnsiConsole.Markup("[red](R)eturn to menu[/]");
         while (true)
         {
-            ConsoleKeyInfo key = Console.ReadKey();
+            ConsoleKeyInfo key = Console.ReadKey(true);
             if (key.Key != ConsoleKey.R) continue;
             Back();
             return;

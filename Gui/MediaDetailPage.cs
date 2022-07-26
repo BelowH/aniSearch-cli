@@ -4,7 +4,7 @@ using Spectre.Console;
 
 namespace aniList_cli.Gui;
 
-public class MediaDetail : IMediaDetail
+public class MediaDetailPage : IMediaDetailPage
 {
     private int _mediaId;
 
@@ -12,12 +12,12 @@ public class MediaDetail : IMediaDetail
     
     public event EventHandler? OnBack;
     
-    public MediaDetail( ISearchRepository searchRepository)
+    public MediaDetailPage( ISearchRepository searchRepository)
     {
         _searchRepository = searchRepository;
     }
     
-    public void Display(int id)
+    public void Display(int id, bool isInList = false)
     {
         _mediaId = id;
         Console.Clear();
