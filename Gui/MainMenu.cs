@@ -58,7 +58,7 @@ public class MainMenu : IMainMenu
                 case ConsoleKey.Enter:
                     EnterSelection(mainList.Select());
                     break;
-                case ConsoleKey.R:
+                case ConsoleKey.E:
                     Exit();
                     break;
                 

@@ -1,9 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
+using aniList_cli.Gui.CustomList;
 using aniList_cli.Repository.Models;
 using aniList_cli.Repository.UnauthenticatedRequests;
 using Spectre.Console;
 
 namespace aniList_cli.Gui;
 
+[SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
 public class SearchPage : ISearchPage
 {
 
@@ -79,67 +82,75 @@ public class SearchPage : ISearchPage
                 }
                 else
                 {
-                    Back();
+                    BackToMenu();
                 }
             }
             
-            List<string> mediaStrings = _currentPage.Media.Select(medium => medium.ToString()).ToList();
-            if (_currentPage.PageInfo.HasNextPage)
+            List<ListItem<SearchMedia>> items = new();
+            foreach (SearchMedia media in _currentPage.Media)
             {
-                mediaStrings.Add(SNextPage);
-            }
-            if (_currentPageNumber > 1)
-            {
-                mediaStrings.Add(SLastPage);
-            }
-            mediaStrings.Add(SBack);
-            if (_currentPage.PageInfo.HasNextPage)
-            {
-                mediaStrings.Add(SNewSearch);
+                string color = media.Type == MediaType.ANIME ? "green" : "blue";
+                items.Add(new ListItem<SearchMedia>(media,color));
             }
 
-            string choice = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                    .Title("[bold]Page: " + _currentPageNumber + "[/]")
-                    .AddChoices(mediaStrings)
-            );
-            switch (choice)
+            string listControls = "[red](R)eturn to menu [/][Yellow](\u2191) Up  [/][yellow](\u2193) Down [/][green](N)ew Search[/]" + Environment.NewLine;
+            if (_currentPageNumber != 1)
             {
-                case SBack:
-                    Back();
-                    break;
-                case SNewSearch:
-                    Display();
-                    break;
-                case SNextPage:
-                    Search(_searchPrompt, _currentPageNumber++);
-                    DisplayResult();
-                    break;
-                case SLastPage:
-                    _currentPageNumber--;
-                    if (_currentPageNumber < 1)
-                    {
-                        _currentPageNumber = 1;
-                    }
-                    Search(_searchPrompt, _currentPageNumber);
-                    DisplayResult();
-                    break;
+                listControls += "[yellow](\u2190) previous Page[/]";
             }
-
-            int id = _currentPage.Media.FirstOrDefault(x => x.TitleMatches(choice))!.Id;
+            if (_currentPage.PageInfo.HasNextPage)
             {
-                _mediaDetailPage.Display(id);
+                listControls += "[yellow](\u2192) next Page[/]";
+            }
+            listControls += Environment.NewLine + "[yellow]Page: " + _currentPageNumber + "[/]";
+            CustomList<SearchMedia> searchList = new CustomList<SearchMedia>(items,"[bold blue]Search Result:[/]",listControls);
+            searchList.Display();
+            Console.CursorVisible = false;
+            while (true)
+            {
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                switch (keyInfo.Key)
+                {
+                    case ConsoleKey.R:
+                        BackToMenu();
+                        break;
+                    case ConsoleKey.N:
+                        Display();
+                        break;
+                    case ConsoleKey.RightArrow:
+                        if (_currentPage.PageInfo.HasNextPage)
+                        {
+                            Search(_searchPrompt, _currentPageNumber++);
+                            DisplayResult();
+                        }
+                        break;
+                    case ConsoleKey.LeftArrow:
+                        _currentPageNumber--;
+                        if (_currentPageNumber < 1)
+                        {
+                            _currentPageNumber = 1;
+                        }
+                        Search(_searchPrompt, _currentPageNumber);
+                        DisplayResult();
+                        break;
+                    case ConsoleKey.Enter:
+                        _mediaDetailPage.Display(searchList.Select().Id);
+                        break;
+                    case ConsoleKey.DownArrow:
+                        searchList.Down();
+                        break;
+                    case ConsoleKey.UpArrow:
+                        searchList.Up();
+                        break;
+                }
             }
         }
-        else
-        {
-            Display();
-        }
-        
+        Display();
     }
     
     private void Search(string searchPrompt, int page)
     {
+        Console.CursorVisible = true;
         AnsiConsole.Status().Start(
             "Searching",
             ctx =>
@@ -151,7 +162,7 @@ public class SearchPage : ISearchPage
     }
 
 
-    private void Back()
+    private void BackToMenu()
     {
         EventHandler? handler = OnBackToMenu;
         handler?.Invoke(this, EventArgs.Empty);

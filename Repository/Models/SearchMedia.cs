@@ -34,8 +34,8 @@ public class SearchMedia
     {
         string type = Type switch
         {
-            MediaType.ANIME => "[green](Anime)[/] ",
-            MediaType.MANGA => "[blue](Manga)[/] ",
+            MediaType.ANIME => "(Anime)",
+            MediaType.MANGA => "(Manga)",
             _ => ""
         };
         return type + GetTitle();

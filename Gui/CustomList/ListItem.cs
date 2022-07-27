@@ -36,7 +36,7 @@ public class ListItem<T>
     {
         if (_isSelceted)
         {
-            AnsiConsole.MarkupLine("[black on " + _color + "](\u2192)\t" + _value + "[/]");
+            AnsiConsole.MarkupLine("["+_color+"](\u2192)\t[/][black on " + _color + "]" + _value + "[/]");
         }
         else
         {
