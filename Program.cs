@@ -2,6 +2,7 @@
 using aniList_cli.Gui;
 using aniList_cli.Helper;
 using aniList_cli.Repository;
+using aniList_cli.Repository.AuthenticatedRequests;
 using aniList_cli.Repository.UnauthenticatedRequests;
 using aniList_cli.Service;
 using aniList_cli.Settings;

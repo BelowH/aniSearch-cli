@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace aniList_cli.Repository.Models;
@@ -15,6 +16,7 @@ public class Media
     public int Id { get; set; }
 
     [JsonProperty(PropertyName = "title")] 
+    [JsonPropertyName("title")]
     public Title Title { get; set; } = new Title();
 
     [JsonProperty(PropertyName = "description")]
