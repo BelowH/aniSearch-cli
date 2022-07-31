@@ -12,7 +12,7 @@ public class SearchPage : ISearchPage
 
     public event EventHandler? OnBackToMenu;
     
-    private readonly ISearchRepository _searchRepository;
+    private readonly IUnAuthenticatedQueries _unAuthenticatedQueries;
 
     private readonly IMediaDetailPage _mediaDetailPage;
 
@@ -29,10 +29,10 @@ public class SearchPage : ISearchPage
     private const string SNewSearch = "[green]New Search[/]";
     private const string SLastPage = "[yellow]Last Page[/]";
     
-    public SearchPage(ISearchRepository searchRepository, IMediaDetailPage mediaDetailPage)
+    public SearchPage(IUnAuthenticatedQueries unAuthenticatedQueries, IMediaDetailPage mediaDetailPage)
     {
         _currentPage = null;
-        _searchRepository = searchRepository;
+        _unAuthenticatedQueries = unAuthenticatedQueries;
         _mediaDetailPage = mediaDetailPage;
         _mediaDetailPage.OnBack += (_, _) => DisplayResult();
     }
@@ -156,7 +156,7 @@ public class SearchPage : ISearchPage
             ctx =>
             {
                 ctx.SpinnerStyle = new Style(Color.Blue);
-                _currentPage = _searchRepository.SearchBySearchString(searchPrompt, page, PageSize).Result;
+                _currentPage = _unAuthenticatedQueries.SearchBySearchString(searchPrompt, page, PageSize);
             }
         );
     }

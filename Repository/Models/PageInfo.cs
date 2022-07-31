@@ -1,18 +1,20 @@
-using Newtonsoft.Json;
+
+
+using System.Text.Json.Serialization;
 
 namespace aniList_cli.Repository.Models;
 
 public class PageInfo
 {
-    [JsonProperty(PropertyName = "perPage")]
+    [JsonPropertyName("perPage")]
     public int PerPage { get; set; } 
 
-    [JsonProperty(PropertyName = "currentPage")]
+    [JsonPropertyName("currentPage")]
     public int CurrentPage { get; set; }
 
-    [JsonProperty(PropertyName = "lastPage")]
+    [JsonPropertyName("lastPage")]
     public int LastPage { get; set; } = 1;
 
-    [JsonProperty(PropertyName = "hasNextPage")]
+    [JsonPropertyName("hasNextPage")]
     public bool HasNextPage { get; set; } = false;
 }

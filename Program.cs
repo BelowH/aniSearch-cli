@@ -66,9 +66,8 @@ static class Program
         services.AddScoped<IMediaListRepository, MediaListRepository>();
         services.AddScoped<IMediaListPage, MediaListPage>();
         services.AddSingleton<ILoginService, LoginService>();
-        services.AddScoped<IUserRepository, UserRepository>();
         services.AddSingleton<IUserPage, UserPage>();
-        services.AddScoped<ISearchRepository,SearchRepository>();
+        services.AddScoped<IUnAuthenticatedQueries,UnAuthenticatedQueries>();
         services.AddTransient<IMediaDetailPage, MediaDetailPage>();
         services.AddTransient<ISearchPage, SearchPage>();
         services.AddSingleton<IMainMenu, MainMenu>();

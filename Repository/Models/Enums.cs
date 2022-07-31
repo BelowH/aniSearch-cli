@@ -4,11 +4,16 @@ using System.Text.Json.Serialization;
 
 namespace aniList_cli.Repository.Models;
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum MediaSeason
 {
+    [EnumMember(Value = "WINTER")]
     WINTER,
+    [EnumMember(Value = "SPRING")]
     SPRING,
+    [EnumMember(Value = "SUMMER")]
     SUMMER,
+    [EnumMember(Value = "FALL")]
     FALL
 }
 
@@ -27,23 +32,37 @@ public enum MediaStatus
     HIATUS
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum MediaFormat
 {
+    [EnumMember(Value = "TV")]
     TV,
+    [EnumMember(Value = "TV_SHORT")]
     TV_SHORT,
+    [EnumMember(Value = "MOVIE")]
     MOVIE,
+    [EnumMember(Value = "SPECIAL")]
     SPECIAL,
+    [EnumMember(Value = "OVA")]
     OVA,
+    [EnumMember(Value = "ONA")]
     ONA,
+    [EnumMember(Value = "MUSIC")]
     MUSIC,
+    [EnumMember(Value = "MANGA")]
     MANGA,
+    [EnumMember(Value = "NOVEL")]
     NOVEL,
+    [EnumMember(Value = "ONE_SHOT")]
     ONE_SHOT
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum MediaType
 {
+    [EnumMember(Value = "ANIME")]
     ANIME,
+    [EnumMember(Value = "MANGA")]
     MANGA
 }
 

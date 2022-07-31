@@ -1,7 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
-using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 
 namespace aniList_cli.Settings;
 
@@ -29,7 +30,7 @@ public class AuthToken
     {
         try
         {
-            string json = JsonConvert.SerializeObject(this);
+            string json = JsonSerializer.Serialize(this);
             File.WriteAllText(_path,json);
         }
         catch (Exception)
@@ -42,20 +43,23 @@ public class AuthToken
     ///  loads token data if File exists.
     /// </summary>
     /// <returns></returns>
-    /// <exception cref="FileNotFoundException">throws if file not found</exception>
+    /// <exception cref="FileNotFoundException">throws if file not found or deserialized file was null</exception>
     public static AuthToken Load()
     {
         if (!File.Exists(_path)) throw new FileNotFoundException("token.json not found");
         
         string json = File.ReadAllText(_path);
-        AuthToken authToken = JsonConvert.DeserializeObject<AuthToken>(json);
+        AuthToken? authToken = JsonSerializer.Deserialize<AuthToken>(json);
+        if (authToken == null)
+        {
+            throw new FileNotFoundException("token.json could not be parsed. (was null)");
+        }
         return authToken;
     }
     
-    [JsonProperty(PropertyName = "token")]
+    [JsonPropertyName("token")]
     public string? Token { get; set; }
-
-
-    [JsonProperty(PropertyName = "expireDate")]
+    
+    [JsonPropertyName("expireDate")]
     public DateTimeOffset? ExpireDate { get; set; }
 }

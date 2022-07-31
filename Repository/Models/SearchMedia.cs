@@ -1,16 +1,17 @@
-using Newtonsoft.Json;
+
+using System.Text.Json.Serialization;
 
 namespace aniList_cli.Repository.Models;
 
 public class SearchMedia
 {
-    [JsonProperty(PropertyName = "id")]
+    [JsonPropertyName("id")]
     public int Id { get; set; }
 
-    [JsonProperty(PropertyName = "title")] 
+    [JsonPropertyName("title")]
     public Title Title { get; set; } = new Title();
 
-    [JsonProperty(PropertyName = "type")]
+    [JsonPropertyName("type")]
     public MediaType Type { get; set; }
 
     public string GetTitle()

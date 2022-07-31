@@ -15,13 +15,13 @@ public class UserPage : IUserPage
 
     private readonly ILoginService _loginService;
 
-    private readonly IUserRepository _userRepository;
+    private readonly IUnAuthenticatedQueries _repository;
 
-    public UserPage(AppParameter parameter, ILoginService loginService, IUserRepository userRepository)
+    public UserPage(AppParameter parameter, ILoginService loginService, IUnAuthenticatedQueries repository)
     {
         _parameter = parameter;
         _loginService = loginService;
-        _userRepository = userRepository;
+        _repository = repository;
     }
 
     public event EventHandler? OnBackToMenu;
@@ -32,8 +32,8 @@ public class UserPage : IUserPage
     /// </summary>
     public void Display()
     {
-        int userId = 0;
-        AniListUser user = new AniListUser(); 
+        int userId;
+        AniListUser? user = null; 
         
         try
         {
@@ -43,7 +43,7 @@ public class UserPage : IUserPage
                 ctx =>
                 {
                     ctx.SpinnerStyle = new Style(Color.Blue);
-                    user = _userRepository.GetUserById(userId).Result!;
+                    user = _repository.GetUserById(userId)!;
                 }
             );
 
@@ -59,6 +59,15 @@ public class UserPage : IUserPage
             Console.ReadKey();
             Back();
         }
+
+        if (user == null)
+        {
+            AnsiConsole.MarkupLine("[red bold]No Media found.[/]\nPress any key to go back.");
+            Console.ReadKey();
+            Back();
+            return;
+        }
+        
         Console.Clear();
         Rule rule = new Rule("[bold blue]" + user.Name + "[/]");
         rule.Alignment = Justify.Center;

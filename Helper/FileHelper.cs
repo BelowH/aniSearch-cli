@@ -1,6 +1,7 @@
 using System.Reflection;
+using System.Text.Json;
 using aniList_cli.Settings;
-using Newtonsoft.Json;
+
 
 namespace aniList_cli.Helper;
 
@@ -19,8 +20,7 @@ public static class FileHelper
                           Path.DirectorySeparatorChar + "settings.json";
 
             string fileContent = File.ReadAllText(path);
-            AppParameter appParameter = JsonConvert.DeserializeObject<AppParameter>(fileContent);
-
+            AppParameter appParameter = JsonSerializer.Deserialize<AppParameter>(fileContent)!;
             return appParameter;
         }
         catch (Exception)

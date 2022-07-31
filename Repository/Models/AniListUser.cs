@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace aniList_cli.Repository.Models;
 
@@ -11,73 +11,73 @@ public class AniListUserData
 
 public class AniListUser
 {
-    [JsonProperty(PropertyName = "name")]
+    [JsonPropertyName("name")]
     public string Name { get; set; } = null!;
 
-    [JsonProperty(PropertyName = "about")]
+    [JsonPropertyName("about")]
     public string? AboutAsHtml { get; set; }
 
-    [JsonProperty(PropertyName = "siteUrl")]
+    [JsonPropertyName("siteUrl")]
     public string? SiteUrl { get; set; }
 
-    [JsonProperty(PropertyName = "updatedAt")]
+    [JsonPropertyName("updatedAt")]
     public int? UpdatedAt { get; set; }
 
-    [JsonProperty(PropertyName = "statistics")]
+    [JsonPropertyName("statistics")]
     public UserStatisticTypes? StatisticTypes { get; set; }
 }
 
 public class UserStatisticTypes
 {
-    [JsonProperty(PropertyName = "anime")]
+    [JsonPropertyName("anime")]
     public UserStatistics? AnimeStatistics { get; set; }
 
-    [JsonProperty(PropertyName = "manga")]
+    [JsonPropertyName("manga")]
     public UserStatistics? MangaStatistics { get; set; }
 }
 
 public class UserStatistics
 {
-    [JsonProperty(PropertyName = "count")]
+    [JsonPropertyName("count")]
     public int Count { get; set; }
 
-    [JsonProperty(PropertyName = "meanScore")]
+    [JsonPropertyName("meanScore")]
     public float MeanScore { get; set; }
 
-    [JsonProperty(PropertyName = "minutesWatched")]
+    [JsonPropertyName("minutesWatched")]
     public int MinutesWatched { get; set; }
 
-    [JsonProperty(PropertyName = "episodesWatched")]
+    [JsonPropertyName("episodesWatched")]
     public int EpisodesWatched { get; set; }
 
-    [JsonProperty(PropertyName = "chaptersRead")]
+
+    [JsonPropertyName("chaptersRead")]
     public int ChaptersRead { get; set; }
-
-    [JsonProperty(PropertyName = "volumesRead")]
+    
+    [JsonPropertyName("volumesRead")]
     public int VolumesRead { get; set; }
-
-    [JsonProperty(PropertyName = "statuses")]
+    
+    [JsonPropertyName("statuses")]
     public UserStatusStatistic[]? Statistic { get; set; }
 }
 
 public class UserStatusStatistic
 {
-
-    [JsonProperty(PropertyName = "count")]
+    [JsonPropertyName("count")]
     public int Count { get; set; }
-
-    [JsonProperty(PropertyName = "meanScore")]
+    
+    [JsonPropertyName("meanScore")]
     public float MeanScore { get; set; }
-
-    [JsonProperty(PropertyName = "minutesWatched")]
+    
+    [JsonPropertyName("minutesWatched")]
     public int MinutesWatched { get; set; }
     
-    [JsonProperty(PropertyName = "chaptersRead")]
+    [JsonPropertyName("chaptersRead")]
     public int ChaptersRead { get; set; }
-
-    [JsonProperty(PropertyName = "status")]
+    
+    [JsonPropertyName("status")]
     public MediaListStatus MediaListStatus { get; set; }
-
-    [JsonProperty(PropertyName = "mediaIds")]
+    
+    [JsonPropertyName("mediaIds")]
     public int[] MediaIds { get; set; } = Array.Empty<int>();
 }

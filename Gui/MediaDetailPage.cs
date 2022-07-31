@@ -8,29 +8,38 @@ public class MediaDetailPage : IMediaDetailPage
 {
     private int _mediaId;
 
-    private readonly ISearchRepository _searchRepository;
+    private readonly IUnAuthenticatedQueries _unAuthenticatedQueries;
     
     public event EventHandler? OnBack;
     
-    public MediaDetailPage( ISearchRepository searchRepository)
+    public MediaDetailPage( IUnAuthenticatedQueries unAuthenticatedQueries)
     {
-        _searchRepository = searchRepository;
+        _unAuthenticatedQueries = unAuthenticatedQueries;
     }
     
     public void Display(int id, bool isInList = false)
     {
         _mediaId = id;
         Console.Clear();
-        Media media = new Media();
+        Media? media = new Media();
         AnsiConsole.Status().Start(
             "Loading Media",
             ctx =>
             {
                 ctx.SpinnerStyle = new Style(Color.Blue);
-                media = _searchRepository.SearchById(_mediaId).Result;
+                media = _unAuthenticatedQueries.SearchById(_mediaId);
             }
         );
 
+        if (media == null)
+        {
+            AnsiConsole.MarkupLine("[red bold]No Media found.[/]\nPress any key to go back.");
+            Console.ReadKey();
+            Back();
+            return;
+        }
+        
+        
         Rule rule = new Rule("[bold blue]"+media.Title + "[/]");
         rule.Alignment = Justify.Center;
         rule.Border = BoxBorder.Rounded;
