@@ -32,7 +32,7 @@ public class MediaListRepository : IMediaListRepository
         string userId = _loginService.GetUserId();
         string token = _loginService.GetToken();
         
-        string graphQlQuery = "query UserListAnime {MediaListCollection(userId : " + userId + ", type : "+ type +"){lists {name,status,entries {id,status,media{id,title {romaji,english,native,userPreferred}}}}}}";
+        string graphQlQuery = "query UserListAnime {MediaListCollection(userId : " + userId + ", type : "+ type +"){lists {name,status,entries {id,status,progress,media{id,chapters,episodes,title {romaji,english,native,userPreferred}}}}}}";
 
         using HttpClient client = new HttpClient();
         client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse("Bearer " + token);
@@ -42,8 +42,7 @@ public class MediaListRepository : IMediaListRepository
 
         HttpResponseMessage response = await client.PostAsync(_parameter.ApiEndpoint, content);
         response.EnsureSuccessStatusCode();
-
-        //TODO: I hate this 
+        
         string responseJson = await response.Content.ReadAsStringAsync();
         string innerDoc = JsonDocument.Parse(responseJson).RootElement.GetProperty("data").ToString();
         MediaListCollectionResponse? result = JsonSerializer.Deserialize<MediaListCollectionResponse?>(innerDoc);

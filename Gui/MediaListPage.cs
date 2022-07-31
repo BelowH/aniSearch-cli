@@ -2,7 +2,6 @@ using System.Security.Authentication;
 using aniList_cli.Gui.CustomList;
 using aniList_cli.Repository.AuthenticatedRequests;
 using aniList_cli.Repository.Models;
-using aniList_cli.Repository.UnauthenticatedRequests;
 using Spectre.Console;
 
 namespace aniList_cli.Gui;
@@ -12,16 +11,23 @@ public class MediaListPage : IMediaListPage
 
     private readonly IMediaListRepository _repository;
 
+    private readonly IMediaDetailPage _mediaDetailPage;
+    
     public event EventHandler? OnBackToMenu;
 
     private MediaListCollection? _mediaListCollection;
 
     private MediaType _type;
+
+    private MediaList? _currentList;
     
-    public MediaListPage(IMediaListRepository repository)
+    public MediaListPage(IMediaListRepository repository, IMediaDetailPage mediaDetailPage)
     {
+        _currentList = null;
         _mediaListCollection = null;
         _repository = repository;
+        _mediaDetailPage = mediaDetailPage;
+        _mediaDetailPage.OnBack += (_, _) => DisplayCurrentMediaList();
     }
     
     public void Display(MediaType type)
@@ -81,16 +87,16 @@ public class MediaListPage : IMediaListPage
                     OnBack();
                     break;
                 case ConsoleKey.Enter:
-                    DisplayMediaList(list.Select());
+                    _currentList = list.Select();
+                    DisplayCurrentMediaList();
                     break;
             }
         }
-        
     }
 
-    private void DisplayMediaList(MediaList mediaList)
+    private void DisplayCurrentMediaList()
     {
-        if (mediaList.Entries == null || mediaList.Entries.Count == 0)
+        if ( _currentList?.Entries == null || _currentList.Entries.Count == 0)
         {
             AnsiConsole.MarkupLine("[red bold]Empty list.[/]");
             AnsiConsole.MarkupLine("[red](R)eturn[/]");
@@ -103,10 +109,10 @@ public class MediaListPage : IMediaListPage
             }
         }
 
-        string title = "[blue bold]" + mediaList + "[/]";
+        string title = "[blue bold]" + _currentList + "[/]";
         
-        List<ListItem<string>> items = (from entry in mediaList.Entries where entry.Media != null select new ListItem<string>(entry.ToString())).ToList();
-        CustomList<string> list = new CustomList<string>(items, title, "[red](R)eturn to Menu [/][Yellow](\u2191) Up  [/][yellow](\u2193) Down  [/][green] (Enter) Select[/]");
+        List<ListItem<MediaListItem>> items = (from entry in _currentList.Entries where entry.Media != null select new ListItem<MediaListItem>(entry)).ToList();
+        CustomList<MediaListItem> list = new CustomList<MediaListItem>(items, title, "[red](R)eturn to List [/][Yellow](\u2191)Up  [/][yellow](\u2193)Down  [/][yellow](\u2190)Previous Page[/] [yellow](\u2192)Next Page[/] [green](Enter) Select[/]", true);
         list.Display();
         
         while (true)
@@ -123,12 +129,23 @@ public class MediaListPage : IMediaListPage
                 case ConsoleKey.R:
                     Display(_type);
                     break;
+                case ConsoleKey.LeftArrow:
+                    list.PreviousPage();
+                    break;
+                case ConsoleKey.RightArrow:
+                    list.NextPage();
+                    break;
+                case ConsoleKey.Enter:
+                    int id = list.Select().Media!.Id;
+                    _mediaDetailPage.Display(id);
+                    break;
             }
         }
     }
     
     private void OnBack()
     {
+        _mediaListCollection = null;
         EventHandler? handler = OnBackToMenu;
         handler?.Invoke(this, EventArgs.Empty);
     }

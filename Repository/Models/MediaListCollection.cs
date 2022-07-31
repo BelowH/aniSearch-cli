@@ -25,28 +25,14 @@ public class MediaList
 {
     [JsonPropertyName("name")]
     public string? Name { get; set; }
-
-    /* 
-      private string? _statusString;
-      
-   [JsonPropertyName("status")]
-      public string? StatusString {
-          get { return _statusString; }
-          set
-          {
-              _statusString = value;
-              if (value != null)
-              {
-                Status =  Enum.Parse<MediaListStatus>(value);
-              }
-          } 
-      }
-      */
+    
     
     [JsonPropertyName("status")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public MediaListStatus Status { get; set; }
-    
+
+    [JsonPropertyName("progress")]
+    public int Progress { get; set; }
     
     [JsonPropertyName("entries")]
     public List<MediaListItem>? Entries { get; set; }
@@ -102,8 +88,7 @@ public class MediaListItem
             {
                 len = Media.Chapters ?? 0;
             }
-            
-            val = Media.Title.ToString() + "(" + Progress + "/" + len + ")";
+            val = Media.Title.ToString() + " (" + Progress + "/" + len + ")";
         }
 
         return val;

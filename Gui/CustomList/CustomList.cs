@@ -4,57 +4,68 @@ namespace aniList_cli.Gui.CustomList;
 
 public class CustomList<T>
 {
-    private List<ListItem<T>> _items;
+    private readonly List<List<ListItem<T>>> _pages;
 
-    private string _title;
+    private readonly string _title;
     
-    private string _controls;
-
+    private readonly string _controls;
+    
+    private readonly bool _pagination;
+    
     private int _pointer;
-
-    private int _length;
-
-    private int _size;
-
-    private int _lastItemToDisplay;
-
     
+    private int _page;
     
-    public CustomList(List<ListItem<T>> items, string markupTitle, string markupControls, int size = 0)
+    public CustomList(List<ListItem<T>> items, string markupTitle, string markupControls, bool pagination = false, int pageSize = 15)
     {
         _controls = markupControls;
         _title = markupTitle;
         _pointer = 0;
-        _length = items.Count;
-        _items = items;
-        _size = size;
-        _lastItemToDisplay = _size > _length ? _length : _size;
+        _page = 0;
+        _pagination = pagination;
+        if (!_pagination)
+        {
+            _pages = new List<List<ListItem<T>>> { items };
+        }
+        else
+        {
+            _pages = items.Select((x, i) => new { Index = i, Value = x })
+                .GroupBy(x => x.Index / pageSize)
+                .Select(x => x.Select(v => v.Value).ToList())
+                .ToList();
+        }
+
     }
 
     public void Display()
     {
         Console.Clear();
         Console.CursorVisible = false;
-        Rule title = new Rule(_title);
-        title.Alignment = Justify.Left;
+        Rule title = new Rule(_title)
+        {
+            Alignment = Justify.Left
+        };
         AnsiConsole.Write(title);
 
-      
-        
-        for (int i = 0; i < _length; i++)
+        for (int i = 0; i < _pages[_page].Count; i++)
         {
             if (i == _pointer)
             {
-                _items[i].Select();
+                _pages[_page][i].Select();
             }
             else
             {
-                _items[i].UnSelect(); 
+                _pages[_page][i].UnSelect(); 
             }
-            _items[i].Display();
+            _pages[_page][i].Display();
         }
-        
-        AnsiConsole.MarkupLine(_controls);
+
+        string lowerRule = _controls;
+        if (_pagination)
+        {
+            lowerRule += " Page: (" + (_page + 1) + " of " + (_pages.Count) + ")";
+        }
+        AnsiConsole.MarkupLine(lowerRule);
     }
 
     public void Up()
@@ -65,14 +76,15 @@ public class CustomList<T>
         }
         else
         {
-            _pointer = _length -1;
+            _pointer = _pages[_page].Count -1;
         }
+        Console.WriteLine(_pointer);
         Display();
     }
 
     public void Down()
     {
-        if (_pointer < _length -1)
+        if (_pointer < _pages[_page].Count -1)
         {
             _pointer++;
         }
@@ -83,8 +95,31 @@ public class CustomList<T>
         Display();
     }
 
+    public void NextPage()
+    {
+        if (!_pagination) return;
+        if (_page < _pages.Count -1)
+        {
+            _pointer = 0;
+            _page++;
+        }
+        Display();
+    }
+
+    public void PreviousPage()
+    {
+        if(!_pagination) return;
+        if (_page > 0)
+        {
+            _pointer = 0;
+            _page--;
+        }
+        Display();
+    }
+    
+    
     public T Select()
     {
-        return _items[_pointer].GetValue();
+        return _pages[_page][_pointer].GetValue();
     }
 }

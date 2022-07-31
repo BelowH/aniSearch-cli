@@ -111,15 +111,14 @@ public class MediaDetailPage : IMediaDetailPage
         while (true)
         {
             ConsoleKeyInfo key = Console.ReadKey(true);
-            if (key.KeyChar.ToString().Equals("R",StringComparison.InvariantCultureIgnoreCase))
+            switch (key.Key)
             {
-                Back();
-                return;
-            }
-            if(key.KeyChar.ToString().Equals("A",StringComparison.InvariantCultureIgnoreCase))
-            {
-                AddToWatchlist();
-                return;
+                case ConsoleKey.R:
+                    Back();
+                    return;
+                case ConsoleKey.A:
+                    AddToWatchlist();
+                    break;
             }
         }
     }

@@ -6,7 +6,7 @@ public class ListItem<T>
 {
     private readonly T _value;
 
-    private bool _isSelceted;
+    public bool IsSelected;
 
     private string _color;
 
@@ -14,7 +14,7 @@ public class ListItem<T>
     {
         _color = color;
         _value = value;
-        _isSelceted = false;
+        IsSelected = false;
     }
 
     public T GetValue()
@@ -24,23 +24,23 @@ public class ListItem<T>
 
     public void Select()
     {
-        _isSelceted = true;
+        IsSelected = true;
     }
 
     public void UnSelect()
     {
-        _isSelceted = false;
+        IsSelected = false;
     }
     
     public void Display()
     {
-        if (_isSelceted)
+        if (IsSelected)
         {
-            AnsiConsole.MarkupLine("["+_color+"](\u2192)\t[/][black on " + _color + "]" + _value + "[/]");
+            AnsiConsole.MarkupLine("["+_color+"](\u2192)\t[/][black on " + _color + "]" +Markup.Escape( _value?.ToString() ?? "" )+ "[/]");
         }
         else
         {
-            AnsiConsole.MarkupLine("[" + _color + "]()\t" + _value + "[/]");
+            AnsiConsole.MarkupLine("[" + _color + "]()\t" + Markup.Escape( _value?.ToString() ?? "" ) + "[/]");
         }
     }
     
