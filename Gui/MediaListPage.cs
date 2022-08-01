@@ -9,7 +9,7 @@ namespace aniList_cli.Gui;
 public class MediaListPage : IMediaListPage
 {
 
-    private readonly IMediaListRepository _repository;
+    private readonly IAuthenticatedQueries _repository;
 
     private readonly IMediaDetailPage _mediaDetailPage;
     
@@ -21,7 +21,7 @@ public class MediaListPage : IMediaListPage
 
     private MediaList? _currentList;
     
-    public MediaListPage(IMediaListRepository repository, IMediaDetailPage mediaDetailPage)
+    public MediaListPage(IAuthenticatedQueries repository, IMediaDetailPage mediaDetailPage)
     {
         _currentList = null;
         _mediaListCollection = null;
@@ -46,7 +46,7 @@ public class MediaListPage : IMediaListPage
                     ctx =>
                     {
                         ctx.SpinnerStyle = new Style(Color.Blue);
-                        _mediaListCollection = _repository.GetMediaListByUserId(type)!.Result;
+                        _mediaListCollection = _repository.GetMediaListByUserId(type)!;
                     }
                 );
             }
@@ -136,8 +136,8 @@ public class MediaListPage : IMediaListPage
                     list.NextPage();
                     break;
                 case ConsoleKey.Enter:
-                    int id = list.Select().Media!.Id;
-                    _mediaDetailPage.Display(id);
+                    MediaListItem listItem = list.Select();
+                    _mediaDetailPage.Display(listItem.Media!.Id,true, _currentList.Status,listItem.Progress);
                     break;
             }
         }

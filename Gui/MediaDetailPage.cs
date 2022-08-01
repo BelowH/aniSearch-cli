@@ -1,5 +1,7 @@
+using aniList_cli.Repository.AuthenticatedRequests;
 using aniList_cli.Repository.Models;
 using aniList_cli.Repository.UnauthenticatedRequests;
+using aniList_cli.Service;
 using Spectre.Console;
 
 namespace aniList_cli.Gui;
@@ -8,29 +10,45 @@ public class MediaDetailPage : IMediaDetailPage
 {
     private int _mediaId;
 
-    private readonly IUnAuthenticatedQueries _unAuthenticatedQueries;
+    private MediaListStatus? _userStatus;
+
+    private int _progress;
+
+    private bool _isInList;
     
+    private readonly IUnAuthenticatedQueries _unAuthenticatedQueries;
+
+    private readonly IAuthenticatedQueries _authenticatedQueries;
+
+    private readonly ILoginService _loginService;
     public event EventHandler? OnBack;
     
-    public MediaDetailPage( IUnAuthenticatedQueries unAuthenticatedQueries)
+    public MediaDetailPage( IUnAuthenticatedQueries unAuthenticatedQueries, ILoginService loginService, IAuthenticatedQueries authenticatedQueries)
     {
         _unAuthenticatedQueries = unAuthenticatedQueries;
+        _loginService = loginService;
+        _authenticatedQueries = authenticatedQueries;
     }
     
-    public void Display(int id, bool isInList = false)
+    public void Display(int id, bool isInList = false, MediaListStatus? userStatus = null, int progress = 0)
     {
         _mediaId = id;
+        MediaStatusInfo? mediaStatusInfo = null;
         Console.Clear();
         Media? media = new Media();
         AnsiConsole.Status().Start(
             "Loading Media",
             ctx =>
             {
+                if (_loginService.IsUserLoggedIn())
+                {
+                    mediaStatusInfo = _authenticatedQueries.GetMediaStatusByMediaId(_mediaId);
+                }
                 ctx.SpinnerStyle = new Style(Color.Blue);
                 media = _unAuthenticatedQueries.SearchById(_mediaId);
             }
         );
-
+        Console.Clear();
         if (media == null)
         {
             AnsiConsole.MarkupLine("[red bold]No Media found.[/]\nPress any key to go back.");
@@ -38,9 +56,21 @@ public class MediaDetailPage : IMediaDetailPage
             Back();
             return;
         }
+        if (mediaStatusInfo != null)
+        {
+            _userStatus = mediaStatusInfo.Status;
+            _isInList = true;
+            _progress = mediaStatusInfo.Progress ?? 0;
+        }
+        else
+        {
+            _userStatus = userStatus;
+            _isInList = isInList;
+            _progress = progress;
+        }
         
         
-        Rule rule = new Rule("[bold blue]"+media.Title + "[/]");
+        Rule rule = new Rule("[bold blue]"+Markup.Escape(media.Title.ToString()) + "[/]");
         rule.Alignment = Justify.Center;
         rule.Border = BoxBorder.Rounded;
         AnsiConsole.Write(rule);
@@ -72,7 +102,7 @@ public class MediaDetailPage : IMediaDetailPage
         seasonTable.Alignment = Justify.Center;
         seasonTable.Border = TableBorder.Rounded;
         seasonTable.AddColumn("Season");
-        seasonTable.AddRow((media.Season.ToString() ?? "-") + " " + (media.SeasonYear.ToString() ?? "-"));
+        seasonTable.AddRow(Markup.Escape((media.Season.ToString() ?? "-") + " " + (media.SeasonYear.ToString() ?? "-")));
 
         Table studioTable = new Table();
         studioTable.Alignment = Justify.Center;
@@ -93,7 +123,7 @@ public class MediaDetailPage : IMediaDetailPage
         {
             studio = "-";
         }
-        studioTable.AddRow(studio);
+        studioTable.AddRow(Markup.Escape(studio));
         
         Table headTable = new Table();
         headTable.Alignment = Justify.Center;
@@ -111,11 +141,49 @@ public class MediaDetailPage : IMediaDetailPage
         descriptionTable.Border = TableBorder.Rounded;
 
         descriptionTable.AddColumn("Description:");
-        descriptionTable.AddRow(media.Description ?? "unknown");
+        descriptionTable.AddRow(Markup.Escape(media.Description ?? "unknown"));
         
         AnsiConsole.Write(descriptionTable);
+
+        if (isInList)
+        {
+            Table listTable = new Table();
+            listTable.HideHeaders();
+            listTable.Alignment = Justify.Center;
+            listTable.Border = TableBorder.Rounded;
+            listTable.AddColumn(new TableColumn(""));
+            if (media.Type == MediaType.ANIME )
+            {
+                listTable.AddRow("Progress: " + _progress + " out of " + (media.Episodes ?? 0));
+            }else 
+            {
+                listTable.AddRow("Progress: " + _progress + " out of " + (media.Chapters ?? 0));
+            }
+            listTable.AddRow("In List: " + _userStatus ?? "-");
+            AnsiConsole.Write(listTable);
+        }
         
-        AnsiConsole.MarkupLine("[red](R)eturn to Search[/] [green](A)dd to Watchlist[/]");
+        string controls = "[red](R)eturn to Search[/] ";
+        if (_isInList)
+        {
+            if (media.Type == MediaType.ANIME)
+            {
+                controls += "[green](A)dd Episode[/] ";
+            }
+            else
+            {
+                controls += "[green](A)dd Chapter[/] ";
+                controls += "[green]add (V)olume[/] ";
+            }
+
+            controls += "[yellow](M)ove to List[/]";
+        }
+        else
+        {
+            controls += "[green](A)dd to Watchlist[/]";
+        }
+        
+        AnsiConsole.MarkupLine(controls);
         
         while (true)
         {
@@ -125,9 +193,41 @@ public class MediaDetailPage : IMediaDetailPage
                 case ConsoleKey.R:
                     Back();
                     return;
-                case ConsoleKey.A:
-                    AddToWatchlist();
+            }
+
+            if (isInList)
+            {
+                switch (key.Key)
+                {
+                    case ConsoleKey.A:
+                        if (media.Type == MediaType.ANIME)
+                        {
+                            //Add episode;
+                        }
+                        else
+                        {
+                            //Add chapter
+                        }
+                        break;
+                    case ConsoleKey.V:
+                        if (media.Type == MediaType.MANGA)
+                        {
+                            //Add volume.
+                        }
+                        break;
+                    case ConsoleKey.M:
+                        //Move Dialog
                     break;
+                }
+            }
+            else
+            {
+                switch (key.Key)
+                {
+                    case ConsoleKey.A:
+                        AddToWatchlist();
+                        break;
+                }
             }
         }
     }

@@ -8,5 +8,7 @@ public interface ILoginService
 
     public string GetUserId();
 
+    public bool IsUserLoggedIn();
+
     public JwtSecurityToken NewToken();
 }

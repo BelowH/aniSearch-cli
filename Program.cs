@@ -63,7 +63,7 @@ static class Program
         services.AddSingleton(parameter);
 
         //register services
-        services.AddScoped<IMediaListRepository, MediaListRepository>();
+        services.AddScoped<IAuthenticatedQueries, AuthenticatedQueries>();
         services.AddScoped<IMediaListPage, MediaListPage>();
         services.AddSingleton<ILoginService, LoginService>();
         services.AddSingleton<IUserPage, UserPage>();

@@ -55,7 +55,16 @@ public class LoginService : ILoginService
     {
         return _userId ?? NewToken().Subject;
     }
-    
+
+    /// <summary>
+    ///  checks if userId and token are set
+    /// </summary>
+    /// <returns>true if user logged in, else false</returns>
+    public bool IsUserLoggedIn()
+    {
+        return _userId != null && _token != null;
+    }
+
     /// <summary>
     ///  opens a browser to the  aniList login page and asks the user to enter the displayed token and then tests it;
     ///  should this fail the user is asked if they want to try again or abort. 
