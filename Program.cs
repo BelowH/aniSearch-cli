@@ -64,6 +64,7 @@ static class Program
 
         //register services
         services.AddScoped<IAuthenticatedQueries, AuthenticatedQueries>();
+        services.AddScoped<IMutationPage, MutationPage>();
         services.AddScoped<IMediaListPage, MediaListPage>();
         services.AddSingleton<ILoginService, LoginService>();
         services.AddSingleton<IUserPage, UserPage>();

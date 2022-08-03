@@ -8,4 +8,8 @@ public interface IAuthenticatedQueries
 
     public MediaStatusInfo? GetMediaStatusByMediaId(int mediaId);
 
+    public void AddMediaToList(MediaListStatus status, int mediaId, int? currentMediaListId = null);
+
+
+
 }

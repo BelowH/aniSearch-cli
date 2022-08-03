@@ -137,7 +137,7 @@ public class MediaListPage : IMediaListPage
                     break;
                 case ConsoleKey.Enter:
                     MediaListItem listItem = list.Select();
-                    _mediaDetailPage.Display(listItem.Media!.Id,true, _currentList.Status,listItem.Progress);
+                    _mediaDetailPage.Display(listItem.Media!.Id);
                     break;
             }
         }

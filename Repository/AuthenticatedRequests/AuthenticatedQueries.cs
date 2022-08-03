@@ -58,8 +58,27 @@ public class AuthenticatedQueries : IAuthenticatedQueries
             return null;
         }
     }
-    
 
+    /// <summary>
+    ///  add media to a List, or moves it to a new list.
+    /// </summary>
+    /// <param name="status">status e.g. list </param>
+    /// <param name="mediaId">media id</param>
+    /// <param name="currentMediaListId">id of the current mediaList item</param>
+    public void AddMediaToList(MediaListStatus status, int mediaId, int? currentMediaListId = null)
+    {
+        string graphQlQuery;
+        if (currentMediaListId != null)
+        {
+            graphQlQuery = "mutation MoveMedia {SaveMediaListEntry(id: "+currentMediaListId+", mediaId: "+mediaId+", status: "+status+") {id}}";
+        }
+        else
+        {
+            graphQlQuery = "mutation AddMedia{SaveMediaListEntry(mediaId: "+mediaId+" status: "+status+"){id}}";
+        }
+        _ = QueryAuthenticatedRequest<object?>(graphQlQuery).Result;
+    }
+    
     private async Task<T?> QueryAuthenticatedRequest<T>(string graphQlQuery)
     {
         string token = _loginService.GetToken();
@@ -76,8 +95,6 @@ public class AuthenticatedQueries : IAuthenticatedQueries
         string innerDoc = JsonDocument.Parse(responseJson).RootElement.GetProperty("data").ToString();
         T? result = JsonSerializer.Deserialize<T?>(innerDoc);
         
-        
-
         return result;
     }
     

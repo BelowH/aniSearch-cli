@@ -20,17 +20,21 @@ public class MediaDetailPage : IMediaDetailPage
 
     private readonly IAuthenticatedQueries _authenticatedQueries;
 
+    private readonly IMutationPage _mutationPage;
+
     private readonly ILoginService _loginService;
     public event EventHandler? OnBack;
     
-    public MediaDetailPage( IUnAuthenticatedQueries unAuthenticatedQueries, ILoginService loginService, IAuthenticatedQueries authenticatedQueries)
+    public MediaDetailPage( IUnAuthenticatedQueries unAuthenticatedQueries, ILoginService loginService, IAuthenticatedQueries authenticatedQueries, IMutationPage mutationPage)
     {
         _unAuthenticatedQueries = unAuthenticatedQueries;
         _loginService = loginService;
         _authenticatedQueries = authenticatedQueries;
+        _mutationPage = mutationPage;
+        _mutationPage.OnBack += (_, _) => Display(_mediaId);
     }
     
-    public void Display(int id, bool isInList = false, MediaListStatus? userStatus = null, int progress = 0)
+    public void Display(int id)
     {
         _mediaId = id;
         MediaStatusInfo? mediaStatusInfo = null;
@@ -62,12 +66,7 @@ public class MediaDetailPage : IMediaDetailPage
             _isInList = true;
             _progress = mediaStatusInfo.Progress ?? 0;
         }
-        else
-        {
-            _userStatus = userStatus;
-            _isInList = isInList;
-            _progress = progress;
-        }
+
         
         
         Rule rule = new Rule("[bold blue]"+Markup.Escape(media.Title.ToString()) + "[/]");
@@ -145,7 +144,7 @@ public class MediaDetailPage : IMediaDetailPage
         
         AnsiConsole.Write(descriptionTable);
 
-        if (isInList)
+        if (mediaStatusInfo != null)
         {
             Table listTable = new Table();
             listTable.HideHeaders();
@@ -195,7 +194,7 @@ public class MediaDetailPage : IMediaDetailPage
                     return;
             }
 
-            if (isInList)
+            if (mediaStatusInfo != null)
             {
                 switch (key.Key)
                 {
@@ -216,6 +215,7 @@ public class MediaDetailPage : IMediaDetailPage
                         }
                         break;
                     case ConsoleKey.M:
+                        _mutationPage.MoveToList(media.Id, mediaStatusInfo);
                         //Move Dialog
                     break;
                 }
@@ -225,7 +225,7 @@ public class MediaDetailPage : IMediaDetailPage
                 switch (key.Key)
                 {
                     case ConsoleKey.A:
-                        AddToWatchlist();
+                        _mutationPage.MoveToList(media.Id);
                         break;
                 }
             }
@@ -238,8 +238,4 @@ public class MediaDetailPage : IMediaDetailPage
         handler?.Invoke(this, EventArgs.Empty);
     }
     
-    public void AddToWatchlist()
-    {
-        
-    }
 }
