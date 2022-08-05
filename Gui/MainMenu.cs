@@ -16,21 +16,17 @@ public class MainMenu : IMainMenu
     public MainMenu( ISearchPage searchPage, IUserPage userPage, IMediaListPage mediaListPage)
     {
         _searchPage = searchPage;
+        _searchPage.OnBack += (_, _) => Display();
         _userPage = userPage;
         _mediaListPage = mediaListPage;
-        _userPage.OnBackToMenu += (_, _) => Display();
-        _searchPage.OnBackToMenu += (_, _) => Display();
-        _mediaListPage.OnBackToMenu += (_, _) => Display();
+        _mediaListPage.OnBack += (_, _) => Display();
     }
 
     private const string SSearch = "Search";
     private const string SAnime = "Anime";
     private const string SManga = "Manga";
     private const string SProfile = "Profile";
-    private const string SSettings = "Settings";
-    private const string SExit = "[red]Exit[/]";
     
-
     public void Display()
     {
         Console.Clear();
@@ -60,8 +56,7 @@ public class MainMenu : IMainMenu
                     break;
                 case ConsoleKey.E:
                     Exit();
-                    break;
-                
+                    return;
             }
         }
     }
@@ -71,16 +66,16 @@ public class MainMenu : IMainMenu
         switch (selection)
         {
             case SSearch:
-                Search();
+                _searchPage.Display();
                 break;
             case SAnime:
-                Anime();
+                _mediaListPage.Display(MediaType.ANIME);
                 break;
             case SManga:
-                Manga();
+                _mediaListPage.Display(MediaType.MANGA);
                 break;
             case SProfile:
-                Profile();
+                _userPage.Display();
                 break;
             default:
                 //should not happen
@@ -89,25 +84,6 @@ public class MainMenu : IMainMenu
         Display();
     }
     
-    private void Search()
-    {
-        _searchPage.Display();
-    }
-
-    private void Anime()
-    {
-        _mediaListPage.Display(MediaType.ANIME);
-    }
-
-    private void Manga()
-    {
-        _mediaListPage.Display(MediaType.MANGA);
-    }
-
-    private void Profile()
-    {
-        _userPage.Display();
-    }
     
     private void Exit()
     {

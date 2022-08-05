@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using aniList_cli.Gui.CustomList;
 using aniList_cli.Repository.Models;
 using aniList_cli.Repository.UnauthenticatedRequests;
+using Microsoft.Extensions.Hosting;
 using Spectre.Console;
 
 namespace aniList_cli.Gui;
@@ -9,8 +10,6 @@ namespace aniList_cli.Gui;
 [SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
 public class SearchPage : ISearchPage
 {
-
-    public event EventHandler? OnBackToMenu;
     
     private readonly IUnAuthenticatedQueries _unAuthenticatedQueries;
 
@@ -24,17 +23,14 @@ public class SearchPage : ISearchPage
 
     private string? _searchPrompt;
     
-    private const string SBack = "[red]Return to Menu[/]";
-    private const string SNextPage = "[yellow]Next Page[/]";
-    private const string SNewSearch = "[green]New Search[/]";
-    private const string SLastPage = "[yellow]Last Page[/]";
+    public event EventHandler? OnBack;
     
     public SearchPage(IUnAuthenticatedQueries unAuthenticatedQueries, IMediaDetailPage mediaDetailPage)
     {
         _currentPage = null;
         _unAuthenticatedQueries = unAuthenticatedQueries;
         _mediaDetailPage = mediaDetailPage;
-        _mediaDetailPage.OnBack += (_, _) => DisplayResult();
+
     }
     
     public void Display()
@@ -48,6 +44,8 @@ public class SearchPage : ISearchPage
 
         SearchAndDisplayPage();
     }
+
+    
 
     private void SearchAndDisplayPage()
     {
@@ -82,7 +80,7 @@ public class SearchPage : ISearchPage
                 }
                 else
                 {
-                    BackToMenu();
+                    return;
                 }
             }
             
@@ -112,8 +110,8 @@ public class SearchPage : ISearchPage
                 switch (keyInfo.Key)
                 {
                     case ConsoleKey.R:
-                        BackToMenu();
-                        break;
+                        Back();
+                        return;
                     case ConsoleKey.N:
                         Display();
                         break;
@@ -134,7 +132,8 @@ public class SearchPage : ISearchPage
                         DisplayResult();
                         break;
                     case ConsoleKey.Enter:
-                        _mediaDetailPage.Display(searchList.Select().Id);
+                         _mediaDetailPage.DisplayMedia(searchList.Select().Id);
+                         DisplayResult();
                         break;
                     case ConsoleKey.DownArrow:
                         searchList.Down();
@@ -161,11 +160,9 @@ public class SearchPage : ISearchPage
         );
     }
 
-
-    private void BackToMenu()
+    private void Back()
     {
-        EventHandler? handler = OnBackToMenu;
-        handler?.Invoke(this, EventArgs.Empty);
-
+        EventHandler? handler = OnBack;
+        handler?.Invoke(this,EventArgs.Empty);
     }
 }

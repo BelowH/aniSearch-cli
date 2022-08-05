@@ -13,13 +13,12 @@ public class MediaListPage : IMediaListPage
 
     private readonly IMediaDetailPage _mediaDetailPage;
     
-    public event EventHandler? OnBackToMenu;
-
     private MediaListCollection? _mediaListCollection;
 
     private MediaType _type;
 
     private MediaList? _currentList;
+    public event EventHandler? OnBack;
     
     public MediaListPage(IAuthenticatedQueries repository, IMediaDetailPage mediaDetailPage)
     {
@@ -27,7 +26,6 @@ public class MediaListPage : IMediaListPage
         _mediaListCollection = null;
         _repository = repository;
         _mediaDetailPage = mediaDetailPage;
-        _mediaDetailPage.OnBack += (_, _) => DisplayCurrentMediaList();
     }
     
     public void Display(MediaType type)
@@ -52,7 +50,7 @@ public class MediaListPage : IMediaListPage
             }
             catch (AuthenticationException)
             {
-                OnBack();
+                return;
             }
         }
         if (_mediaListCollection?.Lists == null || _mediaListCollection.Lists.Count == 0)
@@ -63,7 +61,6 @@ public class MediaListPage : IMediaListPage
             {
                 ConsoleKeyInfo key = Console.ReadKey(true);
                 if (key.Key != ConsoleKey.R) continue;
-                OnBack();
                 return;
             }
             
@@ -84,15 +81,18 @@ public class MediaListPage : IMediaListPage
                     list.Up();
                     break;
                 case ConsoleKey.R:
-                    OnBack();
-                    break;
+                    Back();
+                    return;
                 case ConsoleKey.Enter:
                     _currentList = list.Select();
                     DisplayCurrentMediaList();
-                    break;
+                    Display(type);
+                    return;
             }
         }
     }
+
+  
 
     private void DisplayCurrentMediaList()
     {
@@ -104,7 +104,6 @@ public class MediaListPage : IMediaListPage
             {
                 ConsoleKeyInfo key = Console.ReadKey(true);
                 if (key.Key != ConsoleKey.R) continue;
-                Display(_type);
                 return;
             }
         }
@@ -114,7 +113,7 @@ public class MediaListPage : IMediaListPage
         List<ListItem<MediaListItem>> items = (from entry in _currentList.Entries where entry.Media != null select new ListItem<MediaListItem>(entry)).ToList();
         CustomList<MediaListItem> list = new CustomList<MediaListItem>(items, title, "[red](R)eturn to List [/][Yellow](\u2191)Up  [/][yellow](\u2193)Down  [/][yellow](\u2190)Previous Page[/] [yellow](\u2192)Next Page[/] [green](Enter) Select[/]", true);
         list.Display();
-        
+    
         while (true)
         {
             ConsoleKeyInfo key = Console.ReadKey(true);
@@ -128,7 +127,7 @@ public class MediaListPage : IMediaListPage
                     break;
                 case ConsoleKey.R:
                     Display(_type);
-                    break;
+                    return;
                 case ConsoleKey.LeftArrow:
                     list.PreviousPage();
                     break;
@@ -137,18 +136,17 @@ public class MediaListPage : IMediaListPage
                     break;
                 case ConsoleKey.Enter:
                     MediaListItem listItem = list.Select();
-                    _mediaDetailPage.Display(listItem.Media!.Id);
+                    _mediaDetailPage.DisplayMedia(listItem.Media!.Id);
+                    DisplayCurrentMediaList();
                     break;
             }
         }
     }
-    
-    private void OnBack()
-    {
-        _mediaListCollection = null;
-        EventHandler? handler = OnBackToMenu;
-        handler?.Invoke(this, EventArgs.Empty);
-    }
 
+    private void Back()
+    {
+        EventHandler? handler = OnBack;
+        handler?.Invoke(this,EventArgs.Empty);
+    }
     
 }

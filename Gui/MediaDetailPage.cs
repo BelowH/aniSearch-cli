@@ -23,7 +23,6 @@ public class MediaDetailPage : IMediaDetailPage
     private readonly IMutationPage _mutationPage;
 
     private readonly ILoginService _loginService;
-    public event EventHandler? OnBack;
     
     public MediaDetailPage( IUnAuthenticatedQueries unAuthenticatedQueries, ILoginService loginService, IAuthenticatedQueries authenticatedQueries, IMutationPage mutationPage)
     {
@@ -31,10 +30,10 @@ public class MediaDetailPage : IMediaDetailPage
         _loginService = loginService;
         _authenticatedQueries = authenticatedQueries;
         _mutationPage = mutationPage;
-        _mutationPage.OnBack += (_, _) => Display(_mediaId);
+        _mutationPage.OnBack += (_, _) => DisplayMedia(_mediaId);
     }
     
-    public void Display(int id)
+    public void DisplayMedia(int id)
     {
         _mediaId = id;
         MediaStatusInfo? mediaStatusInfo = null;
@@ -57,7 +56,7 @@ public class MediaDetailPage : IMediaDetailPage
         {
             AnsiConsole.MarkupLine("[red bold]No Media found.[/]\nPress any key to go back.");
             Console.ReadKey();
-            Back();
+            //Back();
             return;
         }
         if (mediaStatusInfo != null)
@@ -66,8 +65,6 @@ public class MediaDetailPage : IMediaDetailPage
             _isInList = true;
             _progress = mediaStatusInfo.Progress ?? 0;
         }
-
-        
         
         Rule rule = new Rule("[bold blue]"+Markup.Escape(media.Title.ToString()) + "[/]");
         rule.Alignment = Justify.Center;
@@ -190,7 +187,6 @@ public class MediaDetailPage : IMediaDetailPage
             switch (key.Key)
             {
                 case ConsoleKey.R:
-                    Back();
                     return;
             }
 
@@ -231,11 +227,4 @@ public class MediaDetailPage : IMediaDetailPage
             }
         }
     }
-
-    public void Back()
-    {
-        EventHandler? handler = OnBack;
-        handler?.Invoke(this, EventArgs.Empty);
-    }
-    
 }

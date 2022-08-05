@@ -33,7 +33,6 @@ static class Program
                 Console.Clear();
                 Environment.Exit(1);
             };
-            
             using (host)
             {
                 await host.StartAsync();
@@ -46,9 +45,9 @@ static class Program
             string version = Assembly.GetExecutingAssembly().GetName().Version!.ToString();
             Console.WriteLine("Sorry, an exception occurred while running: {0}" + Environment.NewLine 
                 + "Version: {1}" + Environment.NewLine + "Exception: {2}" , name, version, e.Message );
+            Console.WriteLine("Press any key to end ...");
+            Console.ReadKey();
         }
-        Console.WriteLine("Press any key to end ...");
-        Console.ReadKey();
     }
 
     /// <summary>
@@ -63,15 +62,15 @@ static class Program
         services.AddSingleton(parameter);
 
         //register services
-        services.AddScoped<IAuthenticatedQueries, AuthenticatedQueries>();
-        services.AddScoped<IMutationPage, MutationPage>();
-        services.AddScoped<IMediaListPage, MediaListPage>();
+        services.AddTransient<IAuthenticatedQueries, AuthenticatedQueries>();
+        services.AddTransient<IMutationPage, MutationPage>();
+        services.AddTransient<IMediaListPage, MediaListPage>();
         services.AddSingleton<ILoginService, LoginService>();
-        services.AddSingleton<IUserPage, UserPage>();
-        services.AddScoped<IUnAuthenticatedQueries,UnAuthenticatedQueries>();
+        services.AddTransient<IUserPage, UserPage>();
+        services.AddTransient<IUnAuthenticatedQueries,UnAuthenticatedQueries>();
         services.AddTransient<IMediaDetailPage, MediaDetailPage>();
         services.AddTransient<ISearchPage, SearchPage>();
-        services.AddSingleton<IMainMenu, MainMenu>();
+        services.AddTransient<IMainMenu, MainMenu>();
         
     }
     

@@ -9,6 +9,6 @@ public interface IMutationPage
     
     public void MoveToList( int mediaId, MediaStatusInfo? info = null);
 
-    public void AddProgress(MediaType type,int mediaId ,int? amount);
+    public void AddProgress(MediaType type,int mediaId ,int? amount, bool volumes = false);
     
 }

@@ -4,9 +4,6 @@ namespace aniList_cli.Gui;
 
 public interface IMediaDetailPage
 {
-    public void Display(int id);
-
-    public void Back();
+    public void DisplayMedia(int id);
     
-    public event EventHandler OnBack;
 }

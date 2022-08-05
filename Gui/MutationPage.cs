@@ -64,7 +64,7 @@ public class MutationPage : IMutationPage
         OnBackToMedia();
     }
 
-    public void AddProgress(MediaType type, int mediaId, int? amount)
+    public void AddProgress(MediaType type, int mediaId, int? amount, bool volumes = false)
     {
         throw new NotImplementedException();
     }

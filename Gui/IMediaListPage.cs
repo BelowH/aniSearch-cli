@@ -6,5 +6,6 @@ public interface IMediaListPage
 {
     public void Display(MediaType type);
 
-    public event EventHandler OnBackToMenu;
+    public event EventHandler OnBack;
+
 }

@@ -3,6 +3,7 @@ namespace aniList_cli.Gui;
 public interface ISearchPage
 {
     public void Display();
-
-    public event EventHandler OnBackToMenu;
+    
+    public event EventHandler OnBack;
+    
 }
