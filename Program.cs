@@ -25,7 +25,7 @@ static class Program
                 .ConfigureServices((context, services) => ConfigureServices(services))
                 .Build();
 
-            //end program when user hist Ctrl + c
+            //end program when user hits ctrl + c
             Console.CancelKeyPress += async (_,_) =>
             {
                 await host.StopAsync(new TimeSpan(100));
@@ -73,9 +73,4 @@ static class Program
         services.AddTransient<IMainMenu, MainMenu>();
         
     }
-    
-    
-    
-    
-
 }

@@ -91,9 +91,7 @@ public class MediaListPage : IMediaListPage
             }
         }
     }
-
-  
-
+    
     private void DisplayCurrentMediaList()
     {
         if ( _currentList?.Entries == null || _currentList.Entries.Count == 0)
@@ -136,7 +134,8 @@ public class MediaListPage : IMediaListPage
                     break;
                 case ConsoleKey.Enter:
                     MediaListItem listItem = list.Select();
-                    _mediaDetailPage.DisplayMedia(listItem.Media!.Id);
+                    IMainMenu.Callback callback = DisplayCurrentMediaList;
+                    _mediaDetailPage.DisplayMedia(listItem.Media!.Id,callback);
                     DisplayCurrentMediaList();
                     break;
             }

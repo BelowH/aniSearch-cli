@@ -4,6 +4,6 @@ namespace aniList_cli.Gui;
 
 public interface IMediaDetailPage
 {
-    public void DisplayMedia(int id);
+    public void DisplayMedia(int id, IMainMenu.Callback caller);
     
 }

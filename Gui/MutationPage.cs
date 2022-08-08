@@ -1,6 +1,7 @@
 using aniList_cli.Gui.CustomList;
 using aniList_cli.Repository.AuthenticatedRequests;
 using aniList_cli.Repository.Models;
+using Spectre.Console;
 
 namespace aniList_cli.Gui;
 
@@ -61,12 +62,40 @@ public class MutationPage : IMutationPage
         {
             _authenticated.AddMediaToList((MediaListStatus)status,mediaId,info.Id);
         }
-        OnBackToMedia();
     }
 
-    public void AddProgress(MediaType type, int mediaId, int? amount, bool volumes = false)
+    public void AddProgress(int mediaId, int currentMediaListId,int currentProgress, bool volume = false)
     {
-        throw new NotImplementedException();
+        int progress = 1;
+        Console.Clear();
+        while (true)
+        {
+            
+            string input = AnsiConsole.Ask<string>("How much do you want to add?","1");
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                break;
+            }
+            if (int.TryParse(input, out progress))
+            {
+                break;
+            }
+            AnsiConsole.MarkupLine("[red]Your input was not a number.[/]");
+            AnsiConsole.MarkupLine("[red]Press any Key to try again or (R) to go Back[/]");
+            ConsoleKey key = Console.ReadKey(true).Key;
+            if (key == ConsoleKey.R)
+            {
+                OnBackToMedia();
+            }
+        }
+        if (volume)
+        {
+            _authenticated.SetVolumeProgress(mediaId,currentMediaListId,currentProgress + progress);
+        }
+        else
+        {
+            _authenticated.SetProgress(mediaId,currentMediaListId,currentProgress + progress); 
+        }
     }
 
     private void OnBackToMedia()

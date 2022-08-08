@@ -2,12 +2,10 @@ using System.Diagnostics.CodeAnalysis;
 using aniList_cli.Gui.CustomList;
 using aniList_cli.Repository.Models;
 using aniList_cli.Repository.UnauthenticatedRequests;
-using Microsoft.Extensions.Hosting;
 using Spectre.Console;
 
 namespace aniList_cli.Gui;
 
-[SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
 public class SearchPage : ISearchPage
 {
     
@@ -30,7 +28,6 @@ public class SearchPage : ISearchPage
         _currentPage = null;
         _unAuthenticatedQueries = unAuthenticatedQueries;
         _mediaDetailPage = mediaDetailPage;
-
     }
     
     public void Display()
@@ -132,7 +129,8 @@ public class SearchPage : ISearchPage
                         DisplayResult();
                         break;
                     case ConsoleKey.Enter:
-                         _mediaDetailPage.DisplayMedia(searchList.Select().Id);
+                        IMainMenu.Callback callback = DisplayResult;
+                         _mediaDetailPage.DisplayMedia(searchList.Select().Id,callback);
                          DisplayResult();
                         break;
                     case ConsoleKey.DownArrow:

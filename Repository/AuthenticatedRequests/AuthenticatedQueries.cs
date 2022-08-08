@@ -78,6 +78,20 @@ public class AuthenticatedQueries : IAuthenticatedQueries
         }
         _ = QueryAuthenticatedRequest<object?>(graphQlQuery).Result;
     }
+
+
+    public void SetProgress(int mediaId, int currentMediaListId, int progress)
+    {
+        string graphQlQuery = "mutation AddMedia{SaveMediaListEntry(id: " + currentMediaListId + " mediaId: " + mediaId + " progress: "+progress+" ){id}}";
+        _ = QueryAuthenticatedRequest<object?>(graphQlQuery).Result;
+    }
+
+    public void SetVolumeProgress(int mediaId, int currentMediaListId, int volumeProgress)
+    {
+        string graphQlQuery = "mutation AddMedia{SaveMediaListEntry(id: " + currentMediaListId + " mediaId: " + mediaId + " progressVolumes: " + volumeProgress + " ){id}}";
+        _ = QueryAuthenticatedRequest<object?>(graphQlQuery).Result;
+    }
+    
     
     private async Task<T?> QueryAuthenticatedRequest<T>(string graphQlQuery)
     {

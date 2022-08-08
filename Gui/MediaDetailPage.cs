@@ -23,6 +23,8 @@ public class MediaDetailPage : IMediaDetailPage
     private readonly IMutationPage _mutationPage;
 
     private readonly ILoginService _loginService;
+
+    private IMainMenu.Callback? _caller;
     
     public MediaDetailPage( IUnAuthenticatedQueries unAuthenticatedQueries, ILoginService loginService, IAuthenticatedQueries authenticatedQueries, IMutationPage mutationPage)
     {
@@ -30,12 +32,13 @@ public class MediaDetailPage : IMediaDetailPage
         _loginService = loginService;
         _authenticatedQueries = authenticatedQueries;
         _mutationPage = mutationPage;
-        _mutationPage.OnBack += (_, _) => DisplayMedia(_mediaId);
+        _mutationPage.OnBack += (_, _) => DisplayMedia(_mediaId, _caller);
     }
     
-    public void DisplayMedia(int id)
+    public void DisplayMedia(int id, IMainMenu.Callback? caller)
     {
         _mediaId = id;
+        _caller = caller;
         MediaStatusInfo? mediaStatusInfo = null;
         Console.Clear();
         Media? media = new Media();
@@ -54,9 +57,9 @@ public class MediaDetailPage : IMediaDetailPage
         Console.Clear();
         if (media == null)
         {
-            AnsiConsole.MarkupLine("[red bold]No Media found.[/]\nPress any key to go back.");
+            AnsiConsole.MarkupLine("[red bold]No Media found.[/]" + Environment.NewLine + "Press any key to go back.");
             Console.ReadKey();
-            //Back();
+            _caller?.Invoke();
             return;
         }
         if (mediaStatusInfo != null)
@@ -187,6 +190,7 @@ public class MediaDetailPage : IMediaDetailPage
             switch (key.Key)
             {
                 case ConsoleKey.R:
+                    _caller?.Invoke();
                     return;
             }
 
@@ -195,25 +199,20 @@ public class MediaDetailPage : IMediaDetailPage
                 switch (key.Key)
                 {
                     case ConsoleKey.A:
-                        if (media.Type == MediaType.ANIME)
-                        {
-                            //Add episode;
-                        }
-                        else
-                        {
-                            //Add chapter
-                        }
+                        _mutationPage.AddProgress(_mediaId,mediaStatusInfo.Id,mediaStatusInfo.Progress ?? 0);
+                        DisplayMedia(_mediaId, _caller);
                         break;
                     case ConsoleKey.V:
                         if (media.Type == MediaType.MANGA)
                         {
-                            //Add volume.
+                            _mutationPage.AddProgress(_mediaId,mediaStatusInfo.Id, 0,true);
+                            DisplayMedia(_mediaId, _caller);
                         }
                         break;
                     case ConsoleKey.M:
                         _mutationPage.MoveToList(media.Id, mediaStatusInfo);
-                        //Move Dialog
-                    break;
+                        DisplayMedia(_mediaId, _caller);
+                        break;
                 }
             }
             else
