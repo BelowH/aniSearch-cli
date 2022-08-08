@@ -64,9 +64,25 @@ public class MutationPage : IMutationPage
         }
     }
 
-    public void AddProgress(int mediaId, int currentMediaListId,int currentProgress, bool volume = false)
+    public void AddProgress(Media media, MediaStatusInfo mediaStatusInfo, bool volume = false)
     {
         int progress = 1;
+        int maxProgress = int.MaxValue;
+        if (volume)
+        {
+            if (media.Volumes is > 0)
+            {
+                maxProgress = media.Volumes ?? int.MaxValue;
+            }
+        }
+        else
+        {
+            if (media.Episodes is > 0)
+            {
+                maxProgress = media.Episodes ?? int.MaxValue;
+            }
+        }
+
         Console.Clear();
         while (true)
         {
@@ -76,11 +92,18 @@ public class MutationPage : IMutationPage
             {
                 break;
             }
-            if (int.TryParse(input, out progress))
+            if (int.TryParse(input, out progress) )
             {
-                break;
+                if (progress <= maxProgress)
+                {
+                    break;
+                }
+                AnsiConsole.Markup("[red]Your input was to big.[/]");
             }
-            AnsiConsole.MarkupLine("[red]Your input was not a number.[/]");
+            else
+            {
+                AnsiConsole.MarkupLine("[red]Your input was not a number.[/]");
+            }
             AnsiConsole.MarkupLine("[red]Press any Key to try again or (R) to go Back[/]");
             ConsoleKey key = Console.ReadKey(true).Key;
             if (key == ConsoleKey.R)
@@ -90,11 +113,12 @@ public class MutationPage : IMutationPage
         }
         if (volume)
         {
-            _authenticated.SetVolumeProgress(mediaId,currentMediaListId,currentProgress + progress);
+            
+            _authenticated.SetVolumeProgress(media.Id,mediaStatusInfo.Id,mediaStatusInfo.ProgressVolumes ?? 0 + progress);
         }
         else
         {
-            _authenticated.SetProgress(mediaId,currentMediaListId,currentProgress + progress); 
+            _authenticated.SetProgress(media.Id,mediaStatusInfo.Id,mediaStatusInfo.ProgressVolumes ?? 0 + progress); 
         }
     }
 

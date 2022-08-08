@@ -21,4 +21,7 @@ public class MediaStatusInfo
 
     [JsonPropertyName("progress")]
     public int? Progress { get; set; }
+    
+    [JsonPropertyName("progressVolumes")]
+    public int? ProgressVolumes { get; set; }
 }

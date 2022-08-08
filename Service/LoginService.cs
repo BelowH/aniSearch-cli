@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Authentication;
 using aniList_cli.Settings;

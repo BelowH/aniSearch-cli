@@ -14,8 +14,6 @@ public class MediaDetailPage : IMediaDetailPage
 
     private int _progress;
 
-    private bool _isInList;
-    
     private readonly IUnAuthenticatedQueries _unAuthenticatedQueries;
 
     private readonly IAuthenticatedQueries _authenticatedQueries;
@@ -65,7 +63,6 @@ public class MediaDetailPage : IMediaDetailPage
         if (mediaStatusInfo != null)
         {
             _userStatus = mediaStatusInfo.Status;
-            _isInList = true;
             _progress = mediaStatusInfo.Progress ?? 0;
         }
         
@@ -144,6 +141,7 @@ public class MediaDetailPage : IMediaDetailPage
         
         AnsiConsole.Write(descriptionTable);
 
+        string controls = "[red](R)eturn to Search[/] ";
         if (mediaStatusInfo != null)
         {
             Table listTable = new Table();
@@ -158,13 +156,8 @@ public class MediaDetailPage : IMediaDetailPage
             {
                 listTable.AddRow("Progress: " + _progress + " out of " + (media.Chapters ?? 0));
             }
-            listTable.AddRow("In List: " + _userStatus ?? "-");
+            listTable.AddRow("In List: " + _userStatus);
             AnsiConsole.Write(listTable);
-        }
-        
-        string controls = "[red](R)eturn to Search[/] ";
-        if (_isInList)
-        {
             if (media.Type == MediaType.ANIME)
             {
                 controls += "[green](A)dd Episode[/] ";
@@ -174,14 +167,12 @@ public class MediaDetailPage : IMediaDetailPage
                 controls += "[green](A)dd Chapter[/] ";
                 controls += "[green]add (V)olume[/] ";
             }
-
             controls += "[yellow](M)ove to List[/]";
         }
         else
         {
-            controls += "[green](A)dd to Watchlist[/]";
+            controls += "[green](A)dd to List[/]";
         }
-        
         AnsiConsole.MarkupLine(controls);
         
         while (true)
@@ -199,13 +190,13 @@ public class MediaDetailPage : IMediaDetailPage
                 switch (key.Key)
                 {
                     case ConsoleKey.A:
-                        _mutationPage.AddProgress(_mediaId,mediaStatusInfo.Id,mediaStatusInfo.Progress ?? 0);
+                        _mutationPage.AddProgress(media,mediaStatusInfo);
                         DisplayMedia(_mediaId, _caller);
                         break;
                     case ConsoleKey.V:
                         if (media.Type == MediaType.MANGA)
                         {
-                            _mutationPage.AddProgress(_mediaId,mediaStatusInfo.Id, 0,true);
+                            _mutationPage.AddProgress(media,mediaStatusInfo,true);
                             DisplayMedia(_mediaId, _caller);
                         }
                         break;

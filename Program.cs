@@ -1,14 +1,12 @@
 ﻿using System.Reflection;
 using aniList_cli.Gui;
-using aniList_cli.Helper;
-using aniList_cli.Repository;
 using aniList_cli.Repository.AuthenticatedRequests;
 using aniList_cli.Repository.UnauthenticatedRequests;
 using aniList_cli.Service;
 using aniList_cli.Settings;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting.Internal;
 
 namespace aniList_cli;
 
@@ -21,8 +19,13 @@ static class Program
         try
         {
             //Setup DI
+            string workingDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
             IHost host = Host.CreateDefaultBuilder(args)
-                .ConfigureServices((context, services) => ConfigureServices(services))
+                .ConfigureHostConfiguration(config =>
+                {
+                    config.AddJsonFile(workingDir + Path.DirectorySeparatorChar + "appsettings.json",false);
+                })
+                .ConfigureServices(ConfigureServices)
                 .Build();
 
             //end program when user hits ctrl + c
@@ -33,6 +36,7 @@ static class Program
                 Console.Clear();
                 Environment.Exit(1);
             };
+            //starting service
             using (host)
             {
                 await host.StartAsync();
@@ -51,14 +55,15 @@ static class Program
     }
 
     /// <summary>
-    ///  And load settings
-    ///  Configure Services for DI
+    /// Configure Services for DI
+    /// and create add parameter
     /// </summary>
+    /// <param name="context"></param>
     /// <param name="services"></param>
-    public static void ConfigureServices(IServiceCollection services)
+    private static void ConfigureServices(HostBuilderContext context,IServiceCollection services)
     {
         //load and register app parameter
-        AppParameter parameter = FileHelper.ReadAppParameter();
+        AppParameter parameter = new AppParameter(context.Configuration);
         services.AddSingleton(parameter);
 
         //register services

@@ -1,5 +1,4 @@
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using aniList_cli.Repository.Models;
@@ -47,7 +46,7 @@ public class AuthenticatedQueries : IAuthenticatedQueries
     public MediaStatusInfo? GetMediaStatusByMediaId(int mediaId)
     {
         string userId = _loginService.GetUserId();
-        string graphQlQuery = "query MediaSearch {MediaList(userId: "+userId+" mediaId: "+mediaId+"){id, mediaId,status,progress}}";
+        string graphQlQuery = "query MediaSearch {MediaList(userId: "+userId+" mediaId: "+mediaId+"){id, mediaId,status,progress,progressVolumes}}";
 
         try
         {
@@ -60,7 +59,7 @@ public class AuthenticatedQueries : IAuthenticatedQueries
     }
 
     /// <summary>
-    ///  add media to a List, or moves it to a new list.
+    ///  adds media to a List, or moves it to a new list.
     /// </summary>
     /// <param name="status">status e.g. list </param>
     /// <param name="mediaId">media id</param>
@@ -79,20 +78,36 @@ public class AuthenticatedQueries : IAuthenticatedQueries
         _ = QueryAuthenticatedRequest<object?>(graphQlQuery).Result;
     }
 
-
+    /// <summary>
+    /// sets the progress of (episodes/chapters) of a media Item
+    /// </summary>
+    /// <param name="mediaId">media id</param>
+    /// <param name="currentMediaListId">id of media in the current list</param>
+    /// <param name="progress">amount of episodes/chapters</param>
     public void SetProgress(int mediaId, int currentMediaListId, int progress)
     {
         string graphQlQuery = "mutation AddMedia{SaveMediaListEntry(id: " + currentMediaListId + " mediaId: " + mediaId + " progress: "+progress+" ){id}}";
         _ = QueryAuthenticatedRequest<object?>(graphQlQuery).Result;
     }
 
+    /// <summary>
+    /// sets he progress of Volumes (only MANGA)
+    /// </summary>
+    /// <param name="mediaId">media id</param>
+    /// <param name="currentMediaListId">if of media in the current list</param>
+    /// <param name="volumeProgress">amount of volumes</param>
     public void SetVolumeProgress(int mediaId, int currentMediaListId, int volumeProgress)
     {
         string graphQlQuery = "mutation AddMedia{SaveMediaListEntry(id: " + currentMediaListId + " mediaId: " + mediaId + " progressVolumes: " + volumeProgress + " ){id}}";
         _ = QueryAuthenticatedRequest<object?>(graphQlQuery).Result;
     }
     
-    
+    /// <summary>
+    ///  query the AniList api with a graphQlQuery
+    /// </summary>
+    /// <param name="graphQlQuery">the query as a string (will be encapsulated into a json http request)</param>
+    /// <typeparam name="T">Return type</typeparam>
+    /// <returns>parsed http response</returns>
     private async Task<T?> QueryAuthenticatedRequest<T>(string graphQlQuery)
     {
         string token = _loginService.GetToken();
