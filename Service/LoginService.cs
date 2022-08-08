@@ -99,7 +99,7 @@ public class LoginService : ILoginService
             }
         }
         
-        string token = AnsiConsole.Prompt(new TextPrompt<string>("Please paste the token:"));
+        string token = AnsiConsole.Ask<string>("Please paste the token:");
 
         try
         {

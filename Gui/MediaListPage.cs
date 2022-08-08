@@ -2,6 +2,7 @@ using System.Security.Authentication;
 using aniList_cli.Gui.CustomList;
 using aniList_cli.Repository.AuthenticatedRequests;
 using aniList_cli.Repository.Models;
+using aniList_cli.Service;
 using Spectre.Console;
 
 namespace aniList_cli.Gui;
@@ -12,6 +13,8 @@ public class MediaListPage : IMediaListPage
     private readonly IAuthenticatedQueries _repository;
 
     private readonly IMediaDetailPage _mediaDetailPage;
+
+    private readonly ILoginService _login;
     
     private MediaListCollection? _mediaListCollection;
 
@@ -20,12 +23,13 @@ public class MediaListPage : IMediaListPage
     private MediaList? _currentList;
     public event EventHandler? OnBack;
     
-    public MediaListPage(IAuthenticatedQueries repository, IMediaDetailPage mediaDetailPage)
+    public MediaListPage(IAuthenticatedQueries repository, IMediaDetailPage mediaDetailPage, ILoginService login)
     {
         _currentList = null;
         _mediaListCollection = null;
         _repository = repository;
         _mediaDetailPage = mediaDetailPage;
+        _login = login;
     }
     
     public void Display(MediaType type)
@@ -36,15 +40,18 @@ public class MediaListPage : IMediaListPage
 
         if (_mediaListCollection == null)
         {
+            
             Console.Clear();
             try
             {
+                string userId = _login.GetUserId();
+                
                 AnsiConsole.Status().Start(
                     "Loading List",
                     ctx =>
                     {
                         ctx.SpinnerStyle = new Style(Color.Blue);
-                        _mediaListCollection = _repository.GetMediaListByUserId(type)!;
+                        _mediaListCollection = _repository.GetMediaListByUserId(type,userId)!;
                     }
                 );
             }

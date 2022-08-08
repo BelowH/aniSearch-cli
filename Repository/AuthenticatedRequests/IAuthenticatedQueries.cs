@@ -4,7 +4,7 @@ namespace aniList_cli.Repository.AuthenticatedRequests;
 
 public interface IAuthenticatedQueries
 {
-    public MediaListCollection? GetMediaListByUserId(MediaType type);
+    public MediaListCollection? GetMediaListByUserId(MediaType type, string userId);
 
     public MediaStatusInfo? GetMediaStatusByMediaId(int mediaId);
 

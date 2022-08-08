@@ -118,7 +118,7 @@ public class MutationPage : IMutationPage
         }
         else
         {
-            _authenticated.SetProgress(media.Id,mediaStatusInfo.Id,mediaStatusInfo.ProgressVolumes ?? 0 + progress); 
+            _authenticated.SetProgress(media.Id,mediaStatusInfo.Id,mediaStatusInfo.Progress ?? 0 + progress); 
         }
     }
 

@@ -19,7 +19,7 @@ static class Program
         try
         {
             //Setup DI
-            string workingDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+            string workingDir = Path.GetDirectoryName(AppContext.BaseDirectory)!;
             IHost host = Host.CreateDefaultBuilder(args)
                 .ConfigureHostConfiguration(config =>
                 {

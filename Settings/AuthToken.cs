@@ -1,5 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -9,7 +8,7 @@ namespace aniList_cli.Settings;
 public class AuthToken
 {
 
-    private static string _path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar +
+    private static string _path = Path.GetDirectoryName(AppContext.BaseDirectory) + Path.DirectorySeparatorChar +
                                  "Config" + Path.DirectorySeparatorChar + "token.json";
     
     public AuthToken()
@@ -31,11 +30,13 @@ public class AuthToken
         try
         {
             string json = JsonSerializer.Serialize(this);
+            Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
             File.WriteAllText(_path,json);
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            // ignore
+            Console.WriteLine(e);
+            throw;
         }
     }
 

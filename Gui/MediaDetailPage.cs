@@ -44,12 +44,19 @@ public class MediaDetailPage : IMediaDetailPage
             "Loading Media",
             ctx =>
             {
+                ctx.SpinnerStyle = new Style(Color.Blue);
+                media = _unAuthenticatedQueries.SearchById(_mediaId);
+            }
+        );
+        AnsiConsole.Status().Start(
+            "Loading Status",
+            ctx =>
+            {
+                ctx.SpinnerStyle = new Style(Color.Blue);
                 if (_loginService.IsUserLoggedIn())
                 {
                     mediaStatusInfo = _authenticatedQueries.GetMediaStatusByMediaId(_mediaId);
-                }
-                ctx.SpinnerStyle = new Style(Color.Blue);
-                media = _unAuthenticatedQueries.SearchById(_mediaId);
+                } 
             }
         );
         Console.Clear();

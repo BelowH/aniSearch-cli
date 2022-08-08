@@ -19,15 +19,15 @@ public class AuthenticatedQueries : IAuthenticatedQueries
         _parameter = parameter;
         _loginService = loginService;
     }
-    
+
     /// <summary>
     ///  searches MediaListCollection for logged in user. 
     /// </summary>
     /// <param name="type">ANIME or MANGA</param>
+    /// <param name="userId">the userId</param>
     /// <returns>MediaListCollection containing media lists of user. Returns null if no collection found. </returns>
-    public MediaListCollection? GetMediaListByUserId(MediaType type )
+    public MediaListCollection? GetMediaListByUserId(MediaType type,string userId )
     {
-        string userId = _loginService.GetUserId();
         string graphQlQuery = "query UserListAnime {MediaListCollection(userId : " + userId + ", type : "+ type +"){lists {name,status,entries {id,status,progress,media{id,chapters,episodes,type,title {romaji,english,native,userPreferred}}}}}}";
 
         MediaListCollection? result = QueryAuthenticatedRequest<MediaListCollectionResponse>(graphQlQuery).Result?.MediaListCollection;
