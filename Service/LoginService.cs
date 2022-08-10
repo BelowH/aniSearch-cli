@@ -9,11 +9,8 @@ namespace aniList_cli.Service;
 
 public class LoginService : ILoginService
 {
-
     private readonly AppParameter _parameter;
-
     private JwtSecurityToken? _token;
-
     private string? _userId;
     
     public LoginService(AppParameter parameter)

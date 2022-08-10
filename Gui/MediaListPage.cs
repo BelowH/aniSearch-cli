@@ -11,21 +11,17 @@ public class MediaListPage : IMediaListPage
 {
 
     private readonly IAuthenticatedQueries _repository;
-
     private readonly IMediaDetailPage _mediaDetailPage;
-
     private readonly ILoginService _login;
     
     private MediaListCollection? _mediaListCollection;
-
     private MediaType _type;
-
-    private MediaList? _currentList;
+    private MediaListStatus? _currentListStatus;
     public event EventHandler? OnBack;
     
     public MediaListPage(IAuthenticatedQueries repository, IMediaDetailPage mediaDetailPage, ILoginService login)
     {
-        _currentList = null;
+        _currentListStatus = null;
         _mediaListCollection = null;
         _repository = repository;
         _mediaDetailPage = mediaDetailPage;
@@ -40,25 +36,7 @@ public class MediaListPage : IMediaListPage
 
         if (_mediaListCollection == null)
         {
-            
-            Console.Clear();
-            try
-            {
-                string userId = _login.GetUserId();
-                
-                AnsiConsole.Status().Start(
-                    "Loading List",
-                    ctx =>
-                    {
-                        ctx.SpinnerStyle = new Style(Color.Blue);
-                        _mediaListCollection = _repository.GetMediaListByUserId(type,userId)!;
-                    }
-                );
-            }
-            catch (AuthenticationException)
-            {
-                return;
-            }
+            LoadLists();
         }
         if (_mediaListCollection?.Lists == null || _mediaListCollection.Lists.Count == 0)
         {
@@ -72,8 +50,8 @@ public class MediaListPage : IMediaListPage
             }
             
         }
-        List<ListItem<MediaList>> items = _mediaListCollection.Lists.Select(mediaList => new ListItem<MediaList>(mediaList)).ToList();
-        CustomList<MediaList> list = new CustomList<MediaList>(items,title,"[red](R)eturn to Menu [/][Yellow](\u2191) Up  [/][yellow](\u2193) Down  [/][green] (Enter) Select[/]" );
+        List<ListItem<MediaListStatus>> items = _mediaListCollection.Lists.Select(mediaList => new ListItem<MediaListStatus>(mediaList.Status)).ToList();
+        CustomList<MediaListStatus> list = new CustomList<MediaListStatus>(items,title,"[red](R)eturn to Menu [/][Yellow](\u2191) Up  [/][yellow](\u2193) Down  [/][green] (Enter) Select[/]" );
         list.Display();
 
         while (true)
@@ -91,7 +69,7 @@ public class MediaListPage : IMediaListPage
                     Back();
                     return;
                 case ConsoleKey.Enter:
-                    _currentList = list.Select();
+                    _currentListStatus = list.Select();
                     DisplayCurrentMediaList();
                     Display(type);
                     return;
@@ -101,7 +79,8 @@ public class MediaListPage : IMediaListPage
     
     private void DisplayCurrentMediaList()
     {
-        if ( _currentList?.Entries == null || _currentList.Entries.Count == 0)
+        MediaList? selectedList  = _mediaListCollection?.Lists?.FirstOrDefault(list => list.Status == _currentListStatus);
+        if (selectedList == null  || selectedList.Entries is { Count: 0 })
         {
             AnsiConsole.MarkupLine("[red bold]Empty list.[/]");
             AnsiConsole.MarkupLine("[red](R)eturn[/]");
@@ -109,13 +88,14 @@ public class MediaListPage : IMediaListPage
             {
                 ConsoleKeyInfo key = Console.ReadKey(true);
                 if (key.Key != ConsoleKey.R) continue;
+                Display(_type);
                 return;
             }
         }
 
-        string title = "[blue bold]" + _currentList + "[/]";
+        string title = "[blue bold]" + _currentListStatus + "[/]";
         
-        List<ListItem<MediaListItem>> items = (from entry in _currentList.Entries where entry.Media != null select new ListItem<MediaListItem>(entry)).ToList();
+        List<ListItem<MediaListItem>> items = (from entry in selectedList.Entries where entry.Media != null select new ListItem<MediaListItem>(entry)).ToList();
         CustomList<MediaListItem> list = new CustomList<MediaListItem>(items, title, "[red](R)eturn to List [/][Yellow](\u2191)Up  [/][yellow](\u2193)Down  [/][yellow](\u2190)Previous Page[/] [yellow](\u2192)Next Page[/] [green](Enter) Select[/]", true);
         list.Display();
     
@@ -141,16 +121,42 @@ public class MediaListPage : IMediaListPage
                     break;
                 case ConsoleKey.Enter:
                     MediaListItem listItem = list.Select();
-                    IMainMenu.Callback callback = DisplayCurrentMediaList;
-                    _mediaDetailPage.DisplayMedia(listItem.Media!.Id,callback);
-                    DisplayCurrentMediaList();
+                    void Callback()
+                    {
+                        LoadLists();
+                        DisplayCurrentMediaList();
+                    }
+                    _mediaDetailPage.DisplayMedia(listItem.Media!.Id,Callback);
                     break;
             }
         }
     }
+    
+    private void LoadLists()
+    {
+        Console.Clear();
+        try
+        {
+            string userId = _login.GetUserId();
+                
+            AnsiConsole.Status().Start(
+                "Loading List",
+                ctx =>
+                {
+                    ctx.SpinnerStyle = new Style(Color.Blue);
+                    _mediaListCollection = _repository.GetMediaListByUserId(_type,userId)!;
+                }
+            );
+        }
+        catch (AuthenticationException)
+        {
+            Back();
+        }   
+    }
 
     private void Back()
     {
+        _mediaListCollection = null;
         EventHandler? handler = OnBack;
         handler?.Invoke(this,EventArgs.Empty);
     }

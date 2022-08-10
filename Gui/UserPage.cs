@@ -1,30 +1,21 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Security.Authentication;
 using aniList_cli.Repository.Models;
 using aniList_cli.Repository.UnauthenticatedRequests;
 using aniList_cli.Service;
-using aniList_cli.Settings;
 using Spectre.Console;
 
 namespace aniList_cli.Gui;
 
 public class UserPage : IUserPage
 {
-
-    private readonly AppParameter _parameter;
-
     private readonly ILoginService _loginService;
-
     private readonly IUnAuthenticatedQueries _repository;
 
-    public UserPage(AppParameter parameter, ILoginService loginService, IUnAuthenticatedQueries repository)
+    public UserPage(ILoginService loginService, IUnAuthenticatedQueries repository)
     {
-        _parameter = parameter;
         _loginService = loginService;
         _repository = repository;
     }
-
-    public event EventHandler? OnBackToMenu;
 
     /// <summary>
     ///  Gets userId from service, then loads user data and displays it.
@@ -51,20 +42,18 @@ public class UserPage : IUserPage
         catch (AuthenticationException)
         {
             //Case jwt token was not valid and user won't retry
-            Back();
+            return;
         }
         catch (Exception e)
         {
             AnsiConsole.Markup("[red]Error:[/] Some error occurred while trying to fetch user data." + Environment.NewLine + e.Message+ Environment.NewLine + "Press any key to continue.");
             Console.ReadKey();
-            Back();
         }
 
         if (user == null)
         {
             AnsiConsole.MarkupLine("[red bold]No Media found.[/]\nPress any key to go back.");
             Console.ReadKey();
-            Back();
             return;
         }
         
@@ -181,14 +170,8 @@ public class UserPage : IUserPage
         {
             ConsoleKeyInfo key = Console.ReadKey(true);
             if (key.Key != ConsoleKey.R) continue;
-            Back();
+           
             return;
         }
-    }
-
-    private void Back()
-    {
-        EventHandler? handler = OnBackToMenu;
-        handler?.Invoke(this, EventArgs.Empty);
     }
 }

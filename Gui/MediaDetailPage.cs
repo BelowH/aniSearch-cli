@@ -8,22 +8,15 @@ namespace aniList_cli.Gui;
 
 public class MediaDetailPage : IMediaDetailPage
 {
-    private int _mediaId;
-
-    private MediaListStatus? _userStatus;
-
-    private int _progress;
-
     private readonly IUnAuthenticatedQueries _unAuthenticatedQueries;
-
     private readonly IAuthenticatedQueries _authenticatedQueries;
-
     private readonly IMutationPage _mutationPage;
-
     private readonly ILoginService _loginService;
 
     private IMainMenu.Callback? _caller;
-    
+    private int _mediaId;
+    private MediaListStatus? _userStatus;
+
     public MediaDetailPage( IUnAuthenticatedQueries unAuthenticatedQueries, ILoginService loginService, IAuthenticatedQueries authenticatedQueries, IMutationPage mutationPage)
     {
         _unAuthenticatedQueries = unAuthenticatedQueries;
@@ -70,7 +63,6 @@ public class MediaDetailPage : IMediaDetailPage
         if (mediaStatusInfo != null)
         {
             _userStatus = mediaStatusInfo.Status;
-            _progress = mediaStatusInfo.Progress ?? 0;
         }
         
         Rule rule = new Rule("[bold blue]"+Markup.Escape(media.Title.ToString()) + "[/]");
@@ -158,10 +150,11 @@ public class MediaDetailPage : IMediaDetailPage
             listTable.AddColumn(new TableColumn(""));
             if (media.Type == MediaType.ANIME )
             {
-                listTable.AddRow("Progress: " + _progress + " out of " + (media.Episodes ?? 0));
+                listTable.AddRow("Episodes: " + mediaStatusInfo.Progress + " out of " + (media.Episodes ?? 0));
             }else 
             {
-                listTable.AddRow("Progress: " + _progress + " out of " + (media.Chapters ?? 0));
+                listTable.AddRow("Chapters: " + mediaStatusInfo.Progress + " out of " + (media.Chapters ?? 0));
+                listTable.AddRow("Volumes: " + mediaStatusInfo.ProgressVolumes + " out of " + (media.Volumes ?? 0));
             }
             listTable.AddRow("In List: " + _userStatus);
             AnsiConsole.Write(listTable);

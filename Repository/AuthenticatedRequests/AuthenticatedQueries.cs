@@ -11,7 +11,6 @@ namespace aniList_cli.Repository.AuthenticatedRequests;
 public class AuthenticatedQueries : IAuthenticatedQueries
 {
     private readonly AppParameter _parameter;
-
     private readonly ILoginService _loginService;
 
     public AuthenticatedQueries(AppParameter parameter, ILoginService loginService)

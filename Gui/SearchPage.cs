@@ -8,17 +8,12 @@ namespace aniList_cli.Gui;
 
 public class SearchPage : ISearchPage
 {
-    
     private readonly IUnAuthenticatedQueries _unAuthenticatedQueries;
-
     private readonly IMediaDetailPage _mediaDetailPage;
 
     private Page? _currentPage;
-
     private int _currentPageNumber;
-    
     private const int PageSize = 10;
-
     private string? _searchPrompt;
     
     public event EventHandler? OnBack;
@@ -77,6 +72,7 @@ public class SearchPage : ISearchPage
                 }
                 else
                 {
+                    Back();
                     return;
                 }
             }
@@ -115,7 +111,7 @@ public class SearchPage : ISearchPage
                     case ConsoleKey.RightArrow:
                         if (_currentPage.PageInfo.HasNextPage)
                         {
-                            Search(_searchPrompt, _currentPageNumber++);
+                            Search(_searchPrompt, ++_currentPageNumber);
                             DisplayResult();
                         }
                         break;

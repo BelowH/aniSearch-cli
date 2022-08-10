@@ -1,16 +1,12 @@
 using aniList_cli.Gui.CustomList;
 using aniList_cli.Repository.Models;
-using Spectre.Console;
-
 namespace aniList_cli.Gui;
 
 public class MainMenu : IMainMenu
 {
     
     private readonly ISearchPage _searchPage;
-
     private readonly IUserPage _userPage;
-
     private readonly IMediaListPage _mediaListPage;
     
     public MainMenu( ISearchPage searchPage, IUserPage userPage, IMediaListPage mediaListPage)
@@ -30,7 +26,6 @@ public class MainMenu : IMainMenu
     public void Display()
     {
         Console.Clear();
-        Rule title = new Rule("[bold blue]Welcome to aniList-cli![/]");
         List<ListItem<string>> mainMenuItems = new List<ListItem<string>>()
         {
             new(SSearch,"green"),
@@ -38,7 +33,7 @@ public class MainMenu : IMainMenu
             new(SManga,"blue"),
             new(SProfile,"blue")
         };
-        CustomList<string> mainList = new CustomList<string>(mainMenuItems,"[bold blue]Welcome to aniList-cli![/]", "[red](E)xit [/][Yellow](\u2191) Up  [/][yellow](\u2193) Down  [/][green] (Enter) Select[/]");
+        CustomList<string> mainList = new CustomList<string>(mainMenuItems,"[bold blue]Welcome to aniSearch-cli![/]", "[red](E)xit [/][Yellow](\u2191) Up  [/][yellow](\u2193) Down  [/][green] (Enter) Select[/]");
         mainList.Display();
         while (true)
         {

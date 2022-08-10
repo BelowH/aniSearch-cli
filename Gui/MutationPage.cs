@@ -21,11 +21,11 @@ public class MutationPage : IMutationPage
         Console.Clear();
         List<ListItem<MediaListStatus>> listItems = new List<ListItem<MediaListStatus>>()
         {
-            new(MediaListStatus.PAUSED),
-            new(MediaListStatus.CURRENT),
-            new(MediaListStatus.DROPPED),
-            new(MediaListStatus.PLANNING),
             new(MediaListStatus.COMPLETED),
+            new(MediaListStatus.DROPPED),
+            new(MediaListStatus.PAUSED),
+            new(MediaListStatus.PLANNING),
+            new(MediaListStatus.CURRENT),
             new(MediaListStatus.REPEATING)
         };
         string controls = "[red](R)eturn [/][Yellow](\u2191) Up  [/][yellow](\u2193) Down  [/][green] (Enter) Select[/]";
@@ -98,7 +98,7 @@ public class MutationPage : IMutationPage
                 {
                     break;
                 }
-                AnsiConsole.Markup("[red]Your input was to big.[/]");
+                AnsiConsole.MarkupLine("[red]Your input was to big.[/]");
             }
             else
             {
@@ -114,11 +114,11 @@ public class MutationPage : IMutationPage
         if (volume)
         {
             
-            _authenticated.SetVolumeProgress(media.Id,mediaStatusInfo.Id,mediaStatusInfo.ProgressVolumes ?? 0 + progress);
+            _authenticated.SetVolumeProgress(media.Id,mediaStatusInfo.Id,(mediaStatusInfo.ProgressVolumes ?? 0) + progress);
         }
         else
         {
-            _authenticated.SetProgress(media.Id,mediaStatusInfo.Id,mediaStatusInfo.Progress ?? 0 + progress); 
+            _authenticated.SetProgress(media.Id,mediaStatusInfo.Id,(mediaStatusInfo.Progress ?? 0) + progress); 
         }
     }
 
